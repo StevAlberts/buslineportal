@@ -1,4 +1,4 @@
-import 'package:buslineportal/ui/views/app_view.dart';
+import 'package:buslineportal/ui/views/auth/auth_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -15,7 +15,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: false,
         primarySwatch: Colors.blue,
       ),
-      home: const AppView(),
+      // home: const AppView(),
+      home: const AuthView(),
     );
   }
 }

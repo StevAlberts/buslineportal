@@ -1,3 +1,4 @@
+import 'package:buslineportal/data/dummy_data.dart';
 import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
 import 'package:buslineportal/ui/views/jobs/jobs_view.dart';
 import 'package:buslineportal/ui/views/settings/settings_view.dart';
@@ -41,8 +42,15 @@ class _AppViewState extends State<AppView> {
           icon: const Icon(Icons.menu),
           onPressed: menuController.toggle,
         ),
-        title: const Text("Busline Portal"),
-        centerTitle: true,
+        title: Text(
+          "Busline Portal",
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.primary,
+                fontSize: 24,
+              ),
+        ),
+        centerTitle: false,
       ),
       body: Center(
         child: _pageOptions[_selectedIndex],
@@ -51,11 +59,21 @@ class _AppViewState extends State<AppView> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
+            SizedBox(
+              height: 80,
+              child: DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                child: Text(
+                  dummyCompany.legalName,
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        fontSize: 18,
+                      ),
+                ),
               ),
-              child: Text('Drawer Header'),
             ),
             ListTile(
               title: const Text('Dashboard'),

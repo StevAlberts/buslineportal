@@ -1,4 +1,5 @@
 import 'package:buslineportal/ui/views/app_view.dart';
+import 'package:buslineportal/ui/widgets/copyright.dart';
 import 'package:flutter/material.dart';
 
 class AuthView extends StatelessWidget {
@@ -9,7 +10,7 @@ class AuthView extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const FlutterLogo(size: 100),
             Text(
@@ -49,6 +50,10 @@ class AuthView extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+                // copy right
+                const SizedBox(
+                  height: 10,
                 ),
               ],
             )

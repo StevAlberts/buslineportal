@@ -1,5 +1,6 @@
 import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
 import 'package:buslineportal/ui/views/jobs/jobs_view.dart';
+import 'package:buslineportal/ui/views/profile/create_profile_view.dart';
 import 'package:buslineportal/ui/views/settings/settings_view.dart';
 import 'package:buslineportal/ui/views/trips/trip_reports_view.dart';
 import 'package:buslineportal/ui/views/trips/trips_view.dart';
@@ -17,12 +18,13 @@ class _AppViewState extends State<AppView> {
   final menuController = ResponsiveMenuController();
   int _selectedIndex = 0;
 
-  static const List<Widget> _pageOptions = <Widget>[
-    DashboardView(),
-    TripsView(),
-    TripReportsView(),
-    JobsView(),
-    SettingsView(),
+  final List<Widget> _pageOptions = <Widget>[
+    const DashboardView(),
+    const TripsView(),
+    const TripReportsView(),
+    const JobsView(),
+    const SettingsView(),
+    CreateProfileView(),
   ];
 
   void _onItemTapped(int index) {
@@ -107,6 +109,15 @@ class _AppViewState extends State<AppView> {
               onTap: () {
                 // Update the state of the app
                 _onItemTapped(4);
+              },
+            ),
+            ListTile(
+              title: const Text('Create profile'),
+              leading: const Icon(Icons.person),
+              selected: _selectedIndex == 5,
+              onTap: () {
+                // Update the state of the app
+                _onItemTapped(5);
               },
             ),
           ],

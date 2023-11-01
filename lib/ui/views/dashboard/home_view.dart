@@ -1,3 +1,4 @@
+import 'package:buslineportal/shared/utils/dynamic_padding.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -6,42 +7,12 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    // double paddingValue;
-    //
-    // if (screenWidth < 600) {
-    //   // For smaller screens
-    //   paddingValue = 16.0;
-    // } else if (screenWidth < 1200) {
-    //   // For medium-sized screens
-    //   paddingValue = 32.0;
-    // } else {
-    //   // For larger screens
-    //   paddingValue = 48.0;
-    // }
-
-    double paddingValue() {
-      double val;
-      if (screenWidth < 600) {
-        // For smaller screens
-        val = 8.0;
-      } else if (screenWidth < 1200) {
-        // For medium-sized screens
-        val = 70.0;
-      } else {
-        // For larger screens
-        val = screenWidth*0.2;
-      }
-      return val;
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: paddingValue()),
+        padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
         child: ListView(
           padding: const EdgeInsets.all(8.0),
           children: [
@@ -92,12 +63,22 @@ class HomeView extends StatelessWidget {
               itemBuilder: (context, index) => ListTile(
                 title: const Text("Trip name"),
                 subtitle: const Text("destination"),
-                trailing: const Padding(
+                leading: const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Icon(
                     Icons.circle,
                     color: Colors.grey,
                   ),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("${(index + 1) * 21}"),
+                    ),
+                    const Icon(Icons.event_seat),
+                  ],
                 ),
                 onTap: () {
                   context.go("/journey_details");

@@ -13,11 +13,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../ui/views/profile/create_profile_view.dart';
 
-final appRouter = GoRouter(
+ appRouter() => GoRouter(
+  initialLocation: '/',
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) =>  AuthView(),
+      builder: (context, state) =>   AuthView(),
     ),
     GoRoute(
       path: '/create_profile',

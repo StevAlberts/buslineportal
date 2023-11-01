@@ -4,21 +4,21 @@ import 'package:go_router/go_router.dart';
 class CreateProfileView extends StatelessWidget {
   CreateProfileView({Key? key}) : super(key: key);
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController(text: "yourFirstName");
-  final _lastNameController = TextEditingController(text: "yourLastName");
-  final _emailController = TextEditingController(text: "yourEmail");
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _companyNameController = TextEditingController();
   final _companyAddressController = TextEditingController();
   final _companyPhoneController = TextEditingController();
   final _companyEmailController =
-      TextEditingController(text: "buscompany@email.com");
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("Register a profile"),
+        title: const Text("Account Registration"),
       ),
       body: ListView(
         padding: const EdgeInsets.all(8.0),
@@ -60,11 +60,11 @@ class CreateProfileView extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextFormField(
-                        enabled: false,
                         controller: _emailController,
                         decoration: const InputDecoration(
                             labelText: ' Email Address',
-                            icon: Icon(Icons.alternate_email)),
+                            icon: Icon(Icons.alternate_email),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a your email address.';
@@ -72,6 +72,34 @@ class CreateProfileView extends StatelessWidget {
                           return null;
                         },
                       ),
+                    ),
+                    TextFormField(
+                      controller: _companyNameController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                          hintText: "Password",
+                          labelText: 'Password',
+                          icon: Icon(Icons.password)),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter password';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _companyNameController,
+                      obscureText: true,
+                      decoration: const InputDecoration(
+                          hintText: "Password",
+                          labelText: 'Confirm password',
+                          icon: Icon(Icons.password)),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter password';
+                        }
+                        return null;
+                      },
                     ),
                     const Divider(),
                     const SizedBox(height: 20),

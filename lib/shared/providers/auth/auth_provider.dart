@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../network/services/authentication_service.dart';
+
+final firebaseUserProvider = StreamProvider<User?>(
+      (ref) => FirebaseAuth.instance.authStateChanges(),
+);
+
+
 final authProvider = StateNotifierProvider<Auth, User?>(
   (ref) => Auth(),
   name: 'authProvider',
@@ -29,27 +36,32 @@ class Auth extends StateNotifier<User?> {
         password: password,
       );
       state = credentials.user;
+
       return {state: ""};
     } on FirebaseAuthException catch (e) {
       return {state: "${e.message}"};
     }
   }
 
-  Future<Map<User?, String>> signup(String email, String password) async {
+  Future<Map<String, dynamic>> signup(String email, String password) async {
     try {
-      final credentials = await _firebaseAuth.createUserWithEmailAndPassword(
+      final credentials = await _firebaseAuth
+          .createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       state = credentials.user;
 
-      // send verification email.
-      await state?.sendEmailVerification();
-
-      return {state: ""};
+      return {
+        "user": state,
+        "error": null,
+      };
     } on FirebaseAuthException catch (e) {
-      return {state: "${e.message}"};
+      return {
+        "user": null,
+        "error": e.message,
+      };
     }
   }
 

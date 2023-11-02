@@ -1,11 +1,14 @@
 import 'package:buslineportal/shared/routes/app_router.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'firebase_options.dart';
+import 'shared/providers/auth/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,24 +21,26 @@ void main() async {
 
   // Both of the following lines are good for testing,
   // but can be removed for release builds
-  // if (kDebugMode) {
-  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  // FirebaseAuth.instance.signOut();
-  // }
+  if (kDebugMode) {
+    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    // FirebaseAuth.instance.signOut();
+  }
 
   runApp(
     const ProviderScope(child: MyApp()),
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final firebaseUser = ref.watch(firebaseUserProvider);
 
     return MaterialApp.router(
       title: 'Busline Portal',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: false,
         // scaffoldBackgroundColor: Colors.white,
@@ -48,7 +53,12 @@ class MyApp extends StatelessWidget {
         }),
         colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue),
       ),
-      routerConfig: appRouter(),
+      // routerConfig: appRouterConfig(firebaseUser),
+      routerConfig: firebaseUser.when(
+        data: (user) => appRouterConfig(user),
+        error: (error, stack) => appRouterConfig(null),
+        loading: () => appRouterConfig(null),
+      ),
     );
   }
 }

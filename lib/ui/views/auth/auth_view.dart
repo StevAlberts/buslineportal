@@ -1,4 +1,6 @@
+import 'package:buslineportal/network/services/authentication_service.dart';
 import 'package:buslineportal/ui/views/app_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -46,6 +48,7 @@ class AuthView extends ConsumerWidget {
           error.state = errorMsg ?? "";
 
           if (errorCode == null) {
+            context.pushReplacement('/dashboard');
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 duration: Duration(seconds: 3),
@@ -74,35 +77,56 @@ class AuthView extends ConsumerWidget {
       if (_formKey.currentState?.saveAndValidate() ?? false) {
         StateController<bool> load = ref.read(loadingProvider.notifier);
         load.state = true;
+
+        var firstName = _formKey.currentState?.instantValue["first_name"];
+        var lastName = _formKey.currentState?.instantValue["last_name"];
         var email = _formKey.currentState?.instantValue["email"];
         var password = _formKey.currentState?.instantValue["password"];
 
-        authNotifier.signup(email, password).then((user) {
+        authNotifier.signup(email, password).then((value) {
           StateController<bool> load = ref.read(loadingProvider.notifier);
           load.state = false;
 
           // show error message
-          var errorCode = user[null];
-          debugPrint(errorCode);
-          StateController<String> error = ref.read(errorMsgProvider.notifier);
-          error.state = errorCode ?? "";
+          String? errorMsg = value['error'];
+          // show user
+          User? user = value['user'];
 
-          if (errorCode == null) {
+          print("Error: $errorMsg");
+          print("User: $user");
+
+          StateController<String> error = ref.read(errorMsgProvider.notifier);
+          error.state = errorMsg ?? "";
+
+          if (errorMsg == null && user != null) {
+            // store user to db
+            authenticationService.addNewUser(user,firstName, lastName).then((value) async {
+              if (value) {
+                // send verification email.
+                await user.sendEmailVerification();
+              }
+            });
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                duration: Duration(seconds: 3),
-                content: ListTile(
-                  leading: Icon(
-                    Icons.check_circle,
-                    color: Colors.green,
-                  ),
-                  title: Text(
-                    "Welcome to Busline Portal.",
-                    style: TextStyle(color: Colors.white),
+                duration: Duration(seconds: 10),
+                content: SafeArea(
+                  child: ListTile(
+                    leading: Icon(
+                      Icons.check_circle,
+                      color: Colors.green,
+                    ),
+                    title: Text(
+                      "Welcome to Busline Portal.",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ),
             );
+
+            StateController<bool> register = ref.read(contactUsProvider.notifier);
+            register.state = false;
           }
 
           // stop loading
@@ -197,7 +221,7 @@ class AuthView extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            "Register an account and we will send you a follow up email to help you get on board",
+                            "Register an account and we will send you a follow up email to get you started.",
                             style: Theme.of(context).textTheme.bodyMedium,
                             textAlign: TextAlign.center,
                           ),
@@ -207,6 +231,38 @@ class AuthView extends ConsumerWidget {
                   ),
                   Column(
                     children: [
+                      Visibility(
+                        visible: register,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FormBuilderTextField(
+                            name: 'first_name',
+                            decoration: const InputDecoration(
+                              labelText: 'First Name',
+                              icon: Icon(Icons.person),
+                            ),
+                            validator: FormBuilderValidators.compose([
+                              FormBuilderValidators.required(),
+                            ]),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: register,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FormBuilderTextField(
+                            name: 'last_name',
+                            decoration: const InputDecoration(
+                              labelText: 'Last Name',
+                              icon: Icon(Icons.person),
+                            ),
+                            validator: FormBuilderValidators.compose([
+                              FormBuilderValidators.required(),
+                            ]),
+                          ),
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: FormBuilderTextField(
@@ -268,10 +324,10 @@ class AuthView extends ConsumerWidget {
                           style: const TextStyle(color: Colors.red),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Visibility(
-                          visible: !register && !forgotPass,
+                      Visibility(
+                        visible: !register && !forgotPass,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
@@ -346,9 +402,13 @@ class AuthView extends ConsumerWidget {
                       child: Center(
                         child: FilledButton(
                           onPressed: registerAccount,
-                          child: const Padding(
-                            padding: EdgeInsets.all(10.0),
-                            child: Text('Register'),
+                          child:  Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: isLoading
+                                ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                                :  const Text('Register'),
                           ),
                         ),
                       ),

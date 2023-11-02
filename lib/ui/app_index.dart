@@ -8,11 +8,27 @@ class AppIndex extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userProvider = ref.watch(authProvider);
+    final userProvider = ref.watch(firebaseUserProvider);
+
     return Scaffold(
       appBar: AppBar(),
-      body:
-          userProvider != null ? const Text("Hello") : const Text("Null User"),
+      body: Center(
+        child: userProvider.when(
+          data: (user) {
+            // The user is authenticated.
+            return Text('Welcome, ${user?.displayName}');
+          },
+          error: (e, s) {
+            // An error occurred.
+            return Text('An error occurred: ${e}');
+          },
+          loading: () {
+            // The stream is loading.
+            return Text('Loading...');
+          },
+        ),
+      ),
     );
+
   }
 }

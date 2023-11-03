@@ -578,7 +578,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               child: FilledButton.icon(
                 icon: const Icon(
                   Icons.edit,
-                  size: 10,
+                  size: 20,
                 ),
                 onPressed: () {
                   pageIndexNotifier.value = 1;
@@ -597,7 +597,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
 
   @override
   Widget build(BuildContext context) {
-    final employeesStream = ref.watch(StreamAllEmployeesProvider("505548"));
+    final employeesStream = ref.watch(StreamCompanyEmployeesProvider("505548"));
 
     return Scaffold(
       appBar: AppBar(
@@ -651,7 +651,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
           ),
           employeesStream.when(
             data: (employees) {
-              return ListView.separated(
+              return employees.isNotEmpty? ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: employees.length,
@@ -722,6 +722,16 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                     ),
                   );
                 },
+              ):Center(
+                child: Column(
+                  children: [
+                    const Icon(Icons.person_off),
+                    Text(
+                      "No employees. Please + add New staff.",
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
+                ),
               );
             },
             error: (error, stack) {

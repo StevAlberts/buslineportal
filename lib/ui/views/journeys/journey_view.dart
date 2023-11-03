@@ -52,12 +52,14 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
   final endDestNotifier = ValueNotifier("");
   final busNotifier = ValueNotifier("");
   final priceNotifier = ValueNotifier("");
+
   WoltModalSheetPage editTripPage(
     BuildContext modalSheetContext,
     TextTheme textTheme,
     Trip? trip,
   ) {
-    final employeesStream = ref.watch(StreamAllEmployeesProvider("505548"));
+    final employeesStream = ref.watch(StreamCompanyEmployeesProvider("505548"));
+
     final selectedStaff = ref.watch(selectedEmployeesProvider);
 
     return WoltModalSheetPage.withSingleChild(
@@ -212,6 +214,67 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   onChanged: (value) => priceNotifier.value = value!,
                 ),
               ),
+              employeesStream.when(
+                data: (employees) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: employees.length,
+                    itemBuilder: (context, index) => FormBuilderSwitch(
+                      contentPadding: EdgeInsets.zero,
+                      name: employees[index].id,
+                      initialValue:
+                      selectedStaff.contains(employees[index]),
+                      title: ListTile(
+                        leading: CircleAvatar(
+                          child: TextAvatar(
+                            text:
+                            '${employees[index].firstName} ${employees[index].lastName}'
+                                .toUpperCase(),
+                            shape: Shape.Circular,
+                            numberLetters: 2,
+                            upperCase: true,
+                          ),
+                        ),
+                        title: Text(
+                            "${employees[index].firstName} ${employees[index].lastName}"),
+                        subtitle: Text(
+                          employees[index].role.toUpperCase(),
+                          style: TextStyle(
+                            color: roleTextColor(employees[index].role),
+                          ),
+                        ),
+                      ),
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(),
+                      ]),
+                      onChanged: (value) {
+                        print(selectedStaff);
+                        if (value != null && value) {
+                          StateController<Set<Employee>> selectedVal =
+                          ref.read(selectedEmployeesProvider.notifier);
+                          selectedVal.state.add(employees[index]);
+                        } else {
+                          StateController<Set<Employee>> selectedVal =
+                          ref.read(selectedEmployeesProvider.notifier);
+                          selectedVal.state.remove(employees[index]);
+                        }
+                        print(selectedStaff);
+                        print(".....");
+                      },
+                    ),
+                  );
+                },
+                error: (error, stack) {
+                  debugPrint("$stack");
+                  return Center(child: Text("$error"));
+                },
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
               // CheckboxListTile( title:Text("keke"),value: false, onChanged: (value){}),
               ExpansionTile(
                 title: const ListTile(
@@ -274,8 +337,11 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                       debugPrint("$stack");
                       return Center(child: Text("$error"));
                     },
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(),
+                    loading: () => const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
                   )
                 ],
@@ -474,7 +540,6 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
           ),
           tripsStream.when(
             data: (trips) {
-              print(trips.length);
               return trips.isNotEmpty
                   ? ListView.builder(
                       shrinkWrap: true,
@@ -505,13 +570,19 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
               print(strace);
               print(error);
               return Center(
-                child: Text(
-                  error.toString(),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    error.toString(),
+                  ),
                 ),
               );
             },
             loading: () => const Center(
-              child: CircularProgressIndicator(),
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: CircularProgressIndicator(),
+              ),
             ),
           ),
         ],

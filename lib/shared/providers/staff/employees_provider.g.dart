@@ -6,8 +6,8 @@ part of 'employees_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamAllEmployeesHash() =>
-    r'22cc1ae0049143f010f43ae30037772b999baeb9';
+String _$streamCompanyEmployeesHash() =>
+    r'e2c000c1baba3e33fb666f9418e6ff442f71e9b3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,27 +30,27 @@ class _SystemHash {
   }
 }
 
-/// See also [streamAllEmployees].
-@ProviderFor(streamAllEmployees)
-const streamAllEmployeesProvider = StreamAllEmployeesFamily();
+/// See also [streamCompanyEmployees].
+@ProviderFor(streamCompanyEmployees)
+const streamCompanyEmployeesProvider = StreamCompanyEmployeesFamily();
 
-/// See also [streamAllEmployees].
-class StreamAllEmployeesFamily extends Family<AsyncValue<List<Employee>>> {
-  /// See also [streamAllEmployees].
-  const StreamAllEmployeesFamily();
+/// See also [streamCompanyEmployees].
+class StreamCompanyEmployeesFamily extends Family<AsyncValue<List<Employee>>> {
+  /// See also [streamCompanyEmployees].
+  const StreamCompanyEmployeesFamily();
 
-  /// See also [streamAllEmployees].
-  StreamAllEmployeesProvider call(
+  /// See also [streamCompanyEmployees].
+  StreamCompanyEmployeesProvider call(
     String companyId,
   ) {
-    return StreamAllEmployeesProvider(
+    return StreamCompanyEmployeesProvider(
       companyId,
     );
   }
 
   @override
-  StreamAllEmployeesProvider getProviderOverride(
-    covariant StreamAllEmployeesProvider provider,
+  StreamCompanyEmployeesProvider getProviderOverride(
+    covariant StreamCompanyEmployeesProvider provider,
   ) {
     return call(
       provider.companyId,
@@ -69,33 +69,33 @@ class StreamAllEmployeesFamily extends Family<AsyncValue<List<Employee>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'streamAllEmployeesProvider';
+  String? get name => r'streamCompanyEmployeesProvider';
 }
 
-/// See also [streamAllEmployees].
-class StreamAllEmployeesProvider
+/// See also [streamCompanyEmployees].
+class StreamCompanyEmployeesProvider
     extends AutoDisposeStreamProvider<List<Employee>> {
-  /// See also [streamAllEmployees].
-  StreamAllEmployeesProvider(
+  /// See also [streamCompanyEmployees].
+  StreamCompanyEmployeesProvider(
     String companyId,
   ) : this._internal(
-          (ref) => streamAllEmployees(
-            ref as StreamAllEmployeesRef,
+          (ref) => streamCompanyEmployees(
+            ref as StreamCompanyEmployeesRef,
             companyId,
           ),
-          from: streamAllEmployeesProvider,
-          name: r'streamAllEmployeesProvider',
+          from: streamCompanyEmployeesProvider,
+          name: r'streamCompanyEmployeesProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$streamAllEmployeesHash,
-          dependencies: StreamAllEmployeesFamily._dependencies,
+                  : _$streamCompanyEmployeesHash,
+          dependencies: StreamCompanyEmployeesFamily._dependencies,
           allTransitiveDependencies:
-              StreamAllEmployeesFamily._allTransitiveDependencies,
+              StreamCompanyEmployeesFamily._allTransitiveDependencies,
           companyId: companyId,
         );
 
-  StreamAllEmployeesProvider._internal(
+  StreamCompanyEmployeesProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -109,12 +109,12 @@ class StreamAllEmployeesProvider
 
   @override
   Override overrideWith(
-    Stream<List<Employee>> Function(StreamAllEmployeesRef provider) create,
+    Stream<List<Employee>> Function(StreamCompanyEmployeesRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: StreamAllEmployeesProvider._internal(
-        (ref) => create(ref as StreamAllEmployeesRef),
+      override: StreamCompanyEmployeesProvider._internal(
+        (ref) => create(ref as StreamCompanyEmployeesRef),
         from: from,
         name: null,
         dependencies: null,
@@ -127,12 +127,13 @@ class StreamAllEmployeesProvider
 
   @override
   AutoDisposeStreamProviderElement<List<Employee>> createElement() {
-    return _StreamAllEmployeesProviderElement(this);
+    return _StreamCompanyEmployeesProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is StreamAllEmployeesProvider && other.companyId == companyId;
+    return other is StreamCompanyEmployeesProvider &&
+        other.companyId == companyId;
   }
 
   @override
@@ -144,18 +145,19 @@ class StreamAllEmployeesProvider
   }
 }
 
-mixin StreamAllEmployeesRef on AutoDisposeStreamProviderRef<List<Employee>> {
+mixin StreamCompanyEmployeesRef
+    on AutoDisposeStreamProviderRef<List<Employee>> {
   /// The parameter `companyId` of this provider.
   String get companyId;
 }
 
-class _StreamAllEmployeesProviderElement
+class _StreamCompanyEmployeesProviderElement
     extends AutoDisposeStreamProviderElement<List<Employee>>
-    with StreamAllEmployeesRef {
-  _StreamAllEmployeesProviderElement(super.provider);
+    with StreamCompanyEmployeesRef {
+  _StreamCompanyEmployeesProviderElement(super.provider);
 
   @override
-  String get companyId => (origin as StreamAllEmployeesProvider).companyId;
+  String get companyId => (origin as StreamCompanyEmployeesProvider).companyId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

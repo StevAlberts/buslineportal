@@ -74,6 +74,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
                 name: 'destination',
+                enabled: destination == null,
                 initialValue: destination ?? "",
                 autovalidateMode: AutovalidateMode.always,
                 onChanged: (value) => destNotifier.value = value!,
@@ -88,33 +89,52 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
             ),
             const Divider(),
             const SizedBox(height: 20),
-            FilledButton(
-              onPressed: () {
-                var newDest = destination ?? destNotifier.value;
-                if (newDest.isNotEmpty) {
-                  databaseService.createRoute(newDest, '505548');
-                  // clean
-                  destNotifier.value = "";
-                  // pop sheet
+            Visibility(
+              visible: destination != null,
+              child: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () {
+                  databaseService.deleteRoute(destination!, "505548");
                   Navigator.pop(modalSheetContext);
-                } else {
-                  // show error
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: ListTile(
-                        leading: Icon(Icons.error_outline, color: Colors.red),
-                        title: Text(
-                          "Please complete the form.",
-                          style: TextStyle(color: Colors.white),
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text("DELETE"),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: destination == null,
+              child: FilledButton(
+                onPressed: () {
+                  var newDest = destination ?? destNotifier.value;
+                  print("New dest: $newDest");
+
+                  if (newDest.isNotEmpty) {
+                    databaseService.createRoute(newDest, '505548');
+                    // clean
+                    destNotifier.value = "";
+                    // pop sheet
+                    Navigator.pop(modalSheetContext);
+                  } else {
+                    // show error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: ListTile(
+                          leading: Icon(Icons.error_outline, color: Colors.red),
+                          title: Text(
+                            "Please complete the form.",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text("SUBMIT"),
+                    );
+                  }
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text("SUBMIT"),
+                ),
               ),
             ),
           ],
@@ -124,7 +144,10 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
   }
 
   WoltModalSheetPage newBusPage(
-      BuildContext modalSheetContext, TextTheme textTheme, Fleet? fleet) {
+    BuildContext modalSheetContext,
+    TextTheme textTheme,
+    Fleet? fleet,
+  ) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
       topBarTitle: Text('New Bus', style: textTheme.titleLarge),
@@ -148,6 +171,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
                 name: 'licence',
+                enabled: fleet == null,
                 initialValue: fleet?.licence ?? "",
                 autovalidateMode: AutovalidateMode.always,
                 validator: FormBuilderValidators.compose([
@@ -164,6 +188,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
                 name: 'Make',
+                enabled: fleet == null,
                 initialValue: fleet?.make ?? "",
                 autovalidateMode: AutovalidateMode.always,
                 validator: FormBuilderValidators.compose([
@@ -171,7 +196,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
                 ]),
                 onChanged: (value) => makeNotifier.value = value!,
                 decoration: const InputDecoration(
-                    icon: Icon(Icons.build_circle_sharp),
+                    icon: Icon(Icons.travel_explore),
                     labelText: 'Make',
                     hintText: "Enter make of the vehicle"),
               ),
@@ -180,6 +205,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
                 name: 'Model',
+                enabled: fleet == null,
                 initialValue: fleet?.model ?? "",
                 autovalidateMode: AutovalidateMode.always,
                 validator: FormBuilderValidators.compose([
@@ -196,9 +222,11 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
                 name: 'Year',
+                enabled: fleet == null,
                 initialValue: fleet?.year.toString() ?? "",
                 autovalidateMode: AutovalidateMode.always,
                 validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.numeric(),
                   FormBuilderValidators.required(),
                 ]),
                 onChanged: (value) => yearNotifier.value = value!,
@@ -212,9 +240,11 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
                 name: 'Capacity',
+                enabled: fleet == null,
                 initialValue: fleet?.capacity.toString() ?? "",
                 autovalidateMode: AutovalidateMode.always,
                 validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.numeric(),
                   FormBuilderValidators.required(),
                 ]),
                 onChanged: (value) => capacityNotifier.value = value!,
@@ -227,60 +257,139 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
             ),
             const Divider(),
             const SizedBox(height: 20),
-            FilledButton(
-              onPressed: () {
-                var licence = fleet?.licence ?? licenceNotifier.value;
-                var make = fleet?.make ?? makeNotifier.value;
-                var model = fleet?.model ?? modelNotifier.value;
-                var year = fleet?.year.toString() ?? yearNotifier.value;
-                var capacity =
-                    fleet?.capacity.toString() ?? capacityNotifier.value;
-
-                if (licence.isNotEmpty &&
-                    make.isNotEmpty &&
-                    model.isNotEmpty &&
-                    year.isNotEmpty &&
-                    licence.isNotEmpty &&
-                    capacity.isNotEmpty) {
-                  // create fleet
-                  var fleet0 = Fleet(
-                    id: licence.toLowerCase(),
-                    companyId: '',
-                    licence: licence,
-                    make: make,
-                    model: model,
-                    year: int.parse(year),
-                    capacity: int.parse(capacity),
-                  );
-                  // add
-                  databaseService.createFleet(fleet0, '505548');
-                  // clean
-                  destNotifier.value = "";
-                  // pop sheet
+            Visibility(
+              visible: fleet != null,
+              child: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                onPressed: () {
+                  databaseService.deleteFleet(fleet!, "505548");
                   Navigator.pop(modalSheetContext);
-                } else {
-                  // show error
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: ListTile(
-                        leading: Icon(Icons.error_outline, color: Colors.red),
-                        title: Text(
-                          "Please complete the form.",
-                          style: TextStyle(color: Colors.white),
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text("DELETE"),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: fleet == null,
+              child: FilledButton(
+                onPressed: () {
+                  var licence = fleet?.licence ?? licenceNotifier.value;
+                  var make = fleet?.make ?? makeNotifier.value;
+                  var model = fleet?.model ?? modelNotifier.value;
+                  var year = fleet?.year.toString() ?? yearNotifier.value;
+                  var capacity =
+                      fleet?.capacity.toString() ?? capacityNotifier.value;
+
+                  if (licence.isNotEmpty &&
+                      make.isNotEmpty &&
+                      model.isNotEmpty &&
+                      year.isNotEmpty &&
+                      licence.isNotEmpty &&
+                      capacity.isNotEmpty) {
+                    // create fleet
+                    var fleet0 = Fleet(
+                      id: licence.toLowerCase(),
+                      companyId: '',
+                      licence: licence,
+                      make: make,
+                      model: model,
+                      year: int.parse(year),
+                      capacity: int.parse(capacity),
+                    );
+                    // add
+                    databaseService.createFleet(fleet0, '505548');
+                    // clean
+                    destNotifier.value = "";
+                    // pop sheet
+                    Navigator.pop(modalSheetContext);
+                  } else {
+                    // show error
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: ListTile(
+                          leading: Icon(Icons.error_outline, color: Colors.red),
+                          title: Text(
+                            "Please complete the form.",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                }
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text("SUBMIT"),
+                    );
+                  }
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Text("SUBMIT"),
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void showRouteDialog({String? destination}) {
+    WoltModalSheet.show<void>(
+      pageIndexNotifier: pageIndexNotifier,
+      context: context,
+      barrierDismissible: false,
+      pageListBuilder: (modalSheetContext) {
+        final textTheme = Theme.of(context).textTheme;
+        return [
+          newRoutePage(modalSheetContext, textTheme, destination),
+        ];
+      },
+      modalTypeBuilder: (context) {
+        final size = MediaQuery.of(context).size.width;
+        if (size < 400) {
+          return WoltModalType.bottomSheet;
+        } else {
+          return WoltModalType.dialog;
+        }
+      },
+      onModalDismissedWithBarrierTap: () {
+        debugPrint('Closed modal sheet with barrier tap');
+        Navigator.of(context).pop();
+        pageIndexNotifier.value = 0;
+      },
+      maxDialogWidth: 560,
+      minDialogWidth: 400,
+      minPageHeight: 0.0,
+      maxPageHeight: 0.9,
+    );
+  }
+
+  void showFleetDialog(Fleet? fleet) {
+    WoltModalSheet.show<void>(
+      pageIndexNotifier: pageIndexNotifier,
+      context: context,
+      barrierDismissible: false,
+      pageListBuilder: (modalSheetContext) {
+        final textTheme = Theme.of(context).textTheme;
+        return [
+          newBusPage(modalSheetContext, textTheme, fleet),
+        ];
+      },
+      modalTypeBuilder: (context) {
+        final size = MediaQuery.of(context).size.width;
+        if (size < 400) {
+          return WoltModalType.bottomSheet;
+        } else {
+          return WoltModalType.dialog;
+        }
+      },
+      onModalDismissedWithBarrierTap: () {
+        debugPrint('Closed modal sheet with barrier tap');
+        Navigator.of(context).pop();
+        pageIndexNotifier.value = 0;
+      },
+      maxDialogWidth: 560,
+      minDialogWidth: 400,
+      minPageHeight: 0.0,
+      maxPageHeight: 0.9,
     );
   }
 
@@ -300,100 +409,68 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
                 title: const Text("Destinations"),
                 subtitle: const Text("Create and manage destination routes"),
                 trailing: FilledButton(
-                  onPressed: () {
-                    WoltModalSheet.show<void>(
-                      pageIndexNotifier: pageIndexNotifier,
-                      context: context,
-                      barrierDismissible: false,
-                      pageListBuilder: (modalSheetContext) {
-                        final textTheme = Theme.of(context).textTheme;
-                        return [
-                          newRoutePage(modalSheetContext, textTheme, null),
-                        ];
-                      },
-                      modalTypeBuilder: (context) {
-                        final size = MediaQuery.of(context).size.width;
-                        if (size < 400) {
-                          return WoltModalType.bottomSheet;
-                        } else {
-                          return WoltModalType.dialog;
-                        }
-                      },
-                      onModalDismissedWithBarrierTap: () {
-                        debugPrint('Closed modal sheet with barrier tap');
-                        Navigator.of(context).pop();
-                        pageIndexNotifier.value = 0;
-                      },
-                      maxDialogWidth: 560,
-                      minDialogWidth: 400,
-                      minPageHeight: 0.0,
-                      maxPageHeight: 0.9,
-                    );
-                  },
+                  onPressed: () => showRouteDialog(),
                   child: const Text("New Route"),
                 ),
               ),
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 3,
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(),
-                itemBuilder: (context, index) => ListTile(
-                  title: const Text("Destination name"),
-                  onTap: () {},
-                ),
-              ),
+              company!.destinations.isNotEmpty
+                  ? ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: company.destinations.length,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          const Divider(),
+                      itemBuilder: (context, index) => ListTile(
+                        leading: const CircleAvatar(
+                          child: Icon(Icons.location_on),
+                        ),
+                        title: Text(
+                          company.destinations[index].toString().toUpperCase(),
+                        ),
+                        onTap: () => showRouteDialog(
+                            destination: company.destinations[index]),
+                      ),
+                    )
+                  : const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("No Destinations. Please add a New Route"),
+                      ),
+                    ),
               const Divider(),
               ListTile(
                 title: const Text("Bus Fleet"),
                 subtitle: const Text("Create and manage bus fleet"),
                 trailing: FilledButton(
-                  onPressed: () {
-                    WoltModalSheet.show<void>(
-                      pageIndexNotifier: pageIndexNotifier,
-                      context: context,
-                      barrierDismissible: false,
-                      pageListBuilder: (modalSheetContext) {
-                        final textTheme = Theme.of(context).textTheme;
-                        return [
-                          newBusPage(modalSheetContext, textTheme, null),
-                        ];
-                      },
-                      modalTypeBuilder: (context) {
-                        final size = MediaQuery.of(context).size.width;
-                        if (size < 400) {
-                          return WoltModalType.bottomSheet;
-                        } else {
-                          return WoltModalType.dialog;
-                        }
-                      },
-                      onModalDismissedWithBarrierTap: () {
-                        debugPrint('Closed modal sheet with barrier tap');
-                        Navigator.of(context).pop();
-                        pageIndexNotifier.value = 0;
-                      },
-                      maxDialogWidth: 560,
-                      minDialogWidth: 400,
-                      minPageHeight: 0.0,
-                      maxPageHeight: 0.9,
-                    );
-                  },
+                  onPressed: () => showFleetDialog(null),
                   child: const Text("New Bus"),
                 ),
               ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 6,
-                itemBuilder: (context, index) => ListTile(
-                  leading: const CircleAvatar(),
-                  title: const Text("Model name"),
-                  subtitle: Text("200$index"),
-                  trailing: Text("${(index + 1) * 21} seats"),
-                  onTap: () {},
-                ),
-              ),
+              company.fleet.isNotEmpty
+                  ? ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: company.fleet.length,
+                      itemBuilder: (context, index) {
+                        var bus = company.fleet[index];
+                        return ListTile(
+                          leading: const CircleAvatar(
+                            child: Icon(Icons.directions_bus_sharp),
+                          ),
+                          title: Text(bus.licence.toUpperCase()),
+                          subtitle: Text(
+                              "${bus.model} (${bus.capacity}) Seater / ${bus.make}"),
+                          trailing: Text(" ${bus.year}"),
+                          onTap: () => showFleetDialog(bus),
+                        );
+                      },
+                    )
+                  : const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("No Buses. Please add a New Bus"),
+                      ),
+                    ),
             ],
           );
         },

@@ -24,6 +24,7 @@ void main() async {
   if (kDebugMode) {
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    await auth.setPersistence(Persistence.LOCAL);
     // FirebaseAuth.instance.signOut();
   }
 

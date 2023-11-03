@@ -16,7 +16,6 @@ class AuthView extends ConsumerWidget {
   final _formKey = GlobalKey<FormBuilderState>();
 
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
-  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -113,11 +112,11 @@ class AuthView extends ConsumerWidget {
                 content: SafeArea(
                   child: ListTile(
                     leading: Icon(
-                      Icons.check_circle,
+                      Icons.auto_awesome,
                       color: Colors.green,
                     ),
                     title: Text(
-                      "Welcome to Busline Portal.",
+                      "Welcome to Busline Portal",
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -221,7 +220,7 @@ class AuthView extends ConsumerWidget {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            "Register an account and we will send you a follow up email to get you started.",
+                            "Create an account and we will send you a follow up email to get you started.",
                             style: Theme.of(context).textTheme.bodyMedium,
                             textAlign: TextAlign.center,
                           ),

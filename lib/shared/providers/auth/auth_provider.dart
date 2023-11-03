@@ -14,15 +14,15 @@ final authProvider = StateNotifierProvider<Auth, User?>(
   name: 'authProvider',
 );
 
-class FirebaseErrors {
-  static void showError(BuildContext context, FirebaseAuthException error) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(error.message!),
-      ),
-    );
-  }
-}
+// class FirebaseErrors {
+//   static void showError(BuildContext context, FirebaseAuthException error) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(
+//         content: Text(error.message!),
+//       ),
+//     );
+//   }
+// }
 
 class Auth extends StateNotifier<User?> {
   Auth() : super(null);

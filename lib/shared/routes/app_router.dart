@@ -1,6 +1,6 @@
 // GoRouter configuration
 import 'package:buslineportal/ui/views/auth/auth_view.dart';
-import 'package:buslineportal/ui/views/dashboard/home_view.dart';
+import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
 import 'package:buslineportal/ui/views/employees/employee_view.dart';
 import 'package:buslineportal/ui/views/inventory/inventories_view.dart';
 import 'package:buslineportal/ui/views/journeys/journey_details_view.dart';
@@ -29,7 +29,7 @@ appRouterConfig(User? firebaseUser) => GoRouter(
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) => const HomeView(),
+          builder: (context, state) => const DashboardView(),
         ),
         GoRoute(
           path: '/login',

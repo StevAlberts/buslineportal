@@ -6,7 +6,7 @@ part of 'company_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamCompanyHash() => r'6a66df6dbd09ea8e6dc81c9d9d659d0ccf0a0be6';
+String _$streamCompanyHash() => r'77ffaed8959cb0a47dc71ed8eb8b049925248397';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,7 +40,7 @@ class StreamCompanyFamily extends Family<AsyncValue<Company?>> {
 
   /// See also [streamCompany].
   StreamCompanyProvider call(
-    String companyId,
+    String? companyId,
   ) {
     return StreamCompanyProvider(
       companyId,
@@ -75,7 +75,7 @@ class StreamCompanyFamily extends Family<AsyncValue<Company?>> {
 class StreamCompanyProvider extends AutoDisposeStreamProvider<Company?> {
   /// See also [streamCompany].
   StreamCompanyProvider(
-    String companyId,
+    String? companyId,
   ) : this._internal(
           (ref) => streamCompany(
             ref as StreamCompanyRef,
@@ -103,7 +103,7 @@ class StreamCompanyProvider extends AutoDisposeStreamProvider<Company?> {
     required this.companyId,
   }) : super.internal();
 
-  final String companyId;
+  final String? companyId;
 
   @override
   Override overrideWith(
@@ -144,7 +144,7 @@ class StreamCompanyProvider extends AutoDisposeStreamProvider<Company?> {
 
 mixin StreamCompanyRef on AutoDisposeStreamProviderRef<Company?> {
   /// The parameter `companyId` of this provider.
-  String get companyId;
+  String? get companyId;
 }
 
 class _StreamCompanyProviderElement
@@ -152,7 +152,7 @@ class _StreamCompanyProviderElement
   _StreamCompanyProviderElement(super.provider);
 
   @override
-  String get companyId => (origin as StreamCompanyProvider).companyId;
+  String? get companyId => (origin as StreamCompanyProvider).companyId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

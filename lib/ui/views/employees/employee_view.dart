@@ -2,17 +2,21 @@ import 'package:buslineportal/network/services/database_services.dart';
 import 'package:buslineportal/shared/models/employee_model.dart';
 import 'package:buslineportal/shared/providers/staff/employees_provider.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
+import '../../../shared/providers/users/user_provider.dart';
 import '../../../shared/utils/date_format_utils.dart';
+import '../../../shared/utils/dynamic_padding.dart';
 import '../../../shared/utils/mask_phone_utils.dart';
-import '../../../shared/utils/role_color_utils.dart';
+import '../../../shared/utils/app_color_utils.dart';
 
 class EmployeeView extends ConsumerStatefulWidget {
   const EmployeeView({Key? key}) : super(key: key);
@@ -35,9 +39,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
   final roleNotifier = ValueNotifier("");
 
   WoltModalSheetPage createStaffPage(
-    BuildContext modalSheetContext,
-    TextTheme textTheme,
-  ) {
+      BuildContext modalSheetContext, TextTheme textTheme, String? companyId) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
       topBarTitle: Text('New Staff Details', style: textTheme.titleLarge),
@@ -123,19 +125,19 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                   ]),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FormBuilderTextField(
-                  name: 'nin',
-                  decoration: const InputDecoration(
-                    labelText: 'NIN',
-                    icon: Icon(Icons.branding_watermark),
-                  ),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                  ]),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: FormBuilderTextField(
+              //     name: 'nin',
+              //     decoration: const InputDecoration(
+              //       labelText: 'NIN',
+              //       icon: Icon(Icons.branding_watermark),
+              //     ),
+              //     validator: FormBuilderValidators.compose([
+              //       FormBuilderValidators.required(),
+              //     ]),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderTextField(
@@ -182,10 +184,10 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                 child: FilledButton(
                   onPressed: () {
                     var uuid = const Uuid().v4();
-                    var companyId = OTP.generateTOTPCodeString(
-                      "JBSWY3DPEHPK3PXP",
-                      1362302550000,
-                    ); // -> '505548'
+                    // var companyId = OTP.generateTOTPCodeString(
+                    //   "JBSWY3DPEHPK3PXP",
+                    //   1362302550000,
+                    // ); // -> '505548'
                     var uuidString = uuid.toString();
                     var employeeId = OTP.generateTOTPCodeString(
                       uuidString,
@@ -202,16 +204,16 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                       var phone = _formKey.currentState?.instantValue["phone"];
                       var role = _formKey.currentState?.instantValue["role"];
                       var dob = _formKey.currentState?.instantValue["dob"];
-                      var nin = _formKey.currentState?.instantValue["nin"];
+                      // var nin = _formKey.currentState?.instantValue["nin"];
 
                       var employee0 = Employee(
                         id: employeeId,
-                        companyId: companyId,
+                        companyId: "$companyId",
                         firstName: firstName,
                         lastName: lastName,
                         gender: gender,
                         dob: dob,
-                        nin: nin,
+                        // nin: nin,
                         phone: phone,
                         role: role,
                         isOnline: false,
@@ -227,7 +229,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                           content: ListTile(
                             leading: Icon(Icons.check, color: Colors.green),
                             title: Text(
-                              "",
+                              "New staff added",
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -236,6 +238,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
 
                       // pop sheet
                       Navigator.pop(modalSheetContext);
+                      pageIndexNotifier.value = 0;
                     }
                   },
                   child: const Padding(
@@ -360,21 +363,21 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                       dobNotifier.value = value!.toIso8601String(),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FormBuilderTextField(
-                  name: 'nin',
-                  initialValue: employee?.nin,
-                  decoration: const InputDecoration(
-                    labelText: 'NIN',
-                    icon: Icon(Icons.branding_watermark),
-                  ),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                  ]),
-                  onChanged: (value) => ninNotifier.value = value!,
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: FormBuilderTextField(
+              //     name: 'nin',
+              //     initialValue: employee?.nin,
+              //     decoration: const InputDecoration(
+              //       labelText: 'NIN',
+              //       icon: Icon(Icons.branding_watermark),
+              //     ),
+              //     validator: FormBuilderValidators.compose([
+              //       FormBuilderValidators.required(),
+              //     ]),
+              //     onChanged: (value) => ninNotifier.value = value!,
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderTextField(
@@ -422,69 +425,89 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               const Divider(),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: FilledButton(
-                  onPressed: () {
-                    var firstName = fnameNotifier.value.isNotEmpty
-                        ? fnameNotifier.value
-                        : employee!.firstName;
-                    var lastName = lnameNotifier.value.isNotEmpty
-                        ? lnameNotifier.value
-                        : employee!.lastName;
-                    var gender = genderNotifier.value.isNotEmpty
-                        ? genderNotifier.value
-                        : employee!.gender;
-                    var phone = phoneNotifier.value.isNotEmpty
-                        ? phoneNotifier.value
-                        : employee!.phone;
-                    var role = roleNotifier.value.isNotEmpty
-                        ? roleNotifier.value
-                        : employee!.role;
-                    var dob = dobNotifier.value.isNotEmpty
-                        ? dobNotifier.value
-                        : employee!.dob.toIso8601String();
-                    var nin = ninNotifier.value.isNotEmpty
-                        ? ninNotifier.value
-                        : employee!.nin;
-
-                    var employee0 = Employee(
-                      id: employee!.id,
-                      companyId: employee.companyId,
-                      firstName: firstName,
-                      lastName: lastName,
-                      gender: gender,
-                      dob: DateTime.parse(dob),
-                      nin: nin,
-                      phone: phone,
-                      role: role,
-                      isOnline: employee.isOnline,
-                      jobs: employee.jobs,
-                    );
-
-                    // update employee to database
-                    databaseService.updateEmployee(employee0);
-
-                    // show success
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: ListTile(
-                          leading: Icon(Icons.check, color: Colors.green),
-                          title: Text(
-                            "Details updated",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilledButton(
+                        style: FilledButton.styleFrom(
+                            backgroundColor: Colors.grey),
+                        onPressed: () {
+                          pageIndexNotifier.value = 2;
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text("DELETE"),
                         ),
                       ),
-                    );
+                    ),
+                    FilledButton(
+                      onPressed: () {
+                        var firstName = fnameNotifier.value.isNotEmpty
+                            ? fnameNotifier.value
+                            : employee!.firstName;
+                        var lastName = lnameNotifier.value.isNotEmpty
+                            ? lnameNotifier.value
+                            : employee!.lastName;
+                        var gender = genderNotifier.value.isNotEmpty
+                            ? genderNotifier.value
+                            : employee!.gender;
+                        var phone = phoneNotifier.value.isNotEmpty
+                            ? phoneNotifier.value
+                            : employee!.phone;
+                        var role = roleNotifier.value.isNotEmpty
+                            ? roleNotifier.value
+                            : employee!.role;
+                        var dob = dobNotifier.value.isNotEmpty
+                            ? dobNotifier.value
+                            : employee!.dob.toIso8601String();
+                        // var nin = ninNotifier.value.isNotEmpty
+                        //     ? ninNotifier.value
+                        //     : employee!.nin;
 
-                    // pop sheet
-                    Navigator.pop(modalSheetContext);
-                    // }
-                  },
-                  style: FilledButton.styleFrom(backgroundColor: Colors.grey),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text("UPDATE"),
-                  ),
+                        var employee0 = Employee(
+                          id: employee!.id,
+                          companyId: employee.companyId,
+                          firstName: firstName,
+                          lastName: lastName,
+                          gender: gender,
+                          dob: DateTime.parse(dob),
+                          // nin: nin,
+                          phone: phone,
+                          role: role,
+                          isOnline: employee.isOnline,
+                          jobs: employee.jobs,
+                        );
+
+                        // update employee to database
+                        databaseService.updateEmployee(employee0);
+
+                        // show success
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: ListTile(
+                              leading: Icon(Icons.check, color: Colors.green),
+                              title: Text(
+                                "Details updated",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        );
+
+                        // pop sheet
+                        Navigator.pop(modalSheetContext);
+                        pageIndexNotifier.value = 0;
+                        // }
+                      },
+                      // style: FilledButton.styleFrom(backgroundColor: Colors.bl),
+                      child: const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text("UPDATE"),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -494,9 +517,121 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
     );
   }
 
+  WoltModalSheetPage confirmDeletePage(
+    BuildContext modalSheetContext,
+    TextTheme textTheme,
+    Employee employee,
+  ) {
+    return WoltModalSheetPage.withSingleChild(
+      hasSabGradient: false,
+      topBarTitle: Text('Confirm Delete', style: textTheme.titleLarge),
+      isTopBarLayerAlwaysVisible: true,
+      leadingNavBarWidget: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
+            padding: const EdgeInsets.all(8.0),
+            icon: const Icon(Icons.arrow_back_outlined),
+            onPressed: () => pageIndexNotifier.value = 0),
+      ),
+      trailingNavBarWidget: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: IconButton(
+          padding: const EdgeInsets.all(8.0),
+          icon: const Icon(Icons.close),
+          onPressed: Navigator.of(modalSheetContext).pop,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                radius: 30,
+                child: TextAvatar(
+                  text: '${employee.firstName} ${employee.lastName}'
+                      .toUpperCase(),
+                  shape: Shape.Circular,
+                  numberLetters: 2,
+                  upperCase: true,
+                  size: 70,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "${employee.firstName} ${employee.lastName}",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            const ListTile(
+              title: Center(
+                child: Text("Are you sure about DELETE staff?"),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FilledButton(
+                    onPressed: () {
+                      // delete employee to database
+                      databaseService.deleteEmployee(employee.id);
+
+                      // show success
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: ListTile(
+                            leading: Icon(Icons.check, color: Colors.red),
+                            title: Text(
+                              "Details deleted",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      );
+
+                      // pop sheet
+                      Navigator.pop(modalSheetContext);
+                      // }
+                    },
+                    style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                    child: const Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text("DELETE"),
+                    ),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      // pop sheet
+                      pageIndexNotifier.value = 0;
+                      Navigator.pop(modalSheetContext);
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text("CANCEL"),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   WoltModalSheetPage staffDetailsPage(
-      BuildContext modalSheetContext, TextTheme textTheme, Employee employee,
-      ) {
+    BuildContext modalSheetContext,
+    TextTheme textTheme,
+    Employee employee,
+    String? compId,
+  ) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
       topBarTitle: Text('Staff Details', style: textTheme.titleLarge),
@@ -536,10 +671,18 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(2.0),
+              padding: const EdgeInsets.all(8.0),
               child: Text(
-                "ID ${employee.id.toUpperCase()}",
-                style: Theme.of(context).textTheme.titleMedium,
+                "COMPANY ID $compId".toUpperCase(),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            ),
+            const SizedBox(height: 10),
+            ListTile(
+              title: const Text("ID"),
+              trailing: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(employee.id.toUpperCase()),
               ),
             ),
             ListTile(
@@ -557,13 +700,6 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               trailing: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(maskPhoneNumber(employee.phone.toUpperCase())),
-              ),
-            ),
-            const ListTile(
-              title: Text("NIN"),
-              trailing: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text("*****************"),
               ),
             ),
             ListTile(
@@ -597,152 +733,280 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
 
   @override
   Widget build(BuildContext context) {
-    final employeesStream = ref.watch(StreamCompanyEmployeesProvider("505548"));
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+    final currentUserStream =
+        ref.read(StreamCurrentUserProvider(firebaseUser!.uid));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Employees"),
-      ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: const Text("Staff list"),
-            subtitle: const Text("Create and manage company staff"),
-            trailing: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FilledButton.icon(
-                style:
-                    FilledButton.styleFrom(backgroundColor: Colors.lightBlue),
-                icon: const Icon(Icons.add),
-                label: const Text("New"),
-                onPressed: () {
-                  WoltModalSheet.show<void>(
-                    pageIndexNotifier: pageCreateIndexNotifier,
-                    context: context,
-                    barrierDismissible: false,
-                    pageListBuilder: (modalSheetContext) {
-                      final textTheme = Theme.of(context).textTheme;
-                      return [
-                        // new staff
-                        createStaffPage(modalSheetContext, textTheme),
-                      ];
-                    },
-                    modalTypeBuilder: (context) {
-                      final size = MediaQuery.of(context).size.width;
-                      if (size < 400) {
-                        return WoltModalType.bottomSheet;
-                      } else {
-                        return WoltModalType.dialog;
-                      }
-                    },
-                    onModalDismissedWithBarrierTap: () {
-                      debugPrint('Closed modal sheet with barrier tap');
-                      Navigator.of(context).pop();
-                      pageCreateIndexNotifier.value = 0;
-                    },
-                    maxDialogWidth: 560,
-                    minDialogWidth: 400,
-                    minPageHeight: 0.0,
-                    maxPageHeight: 0.9,
-                  );
+        title: Padding(
+          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  context.pushReplacement('/');
                 },
-              ),
-            ),
-          ),
-          employeesStream.when(
-            data: (employees) {
-              return employees.isNotEmpty? ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: employees.length,
-                separatorBuilder: (BuildContext context, int index) =>
-                    const Divider(height: 0),
-                itemBuilder: (context, index) {
-                  var employee = employees[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      child: TextAvatar(
-                        text: '${employee.firstName} ${employee.lastName}'
-                            .toUpperCase(),
-                        shape: Shape.Circular,
-                        numberLetters: 2,
-                        upperCase: true,
-                      ),
-                    ),
-                    title: Text("${employee.firstName} ${employee.lastName}"),
-                    subtitle: Text("ID ${employee.id.toUpperCase()}"),
-                    onTap: () {
-                      WoltModalSheet.show<void>(
-                        pageIndexNotifier: pageIndexNotifier,
-                        context: context,
-                        barrierDismissible: false,
-                        pageListBuilder: (modalSheetContext) {
-                          final textTheme = Theme.of(context).textTheme;
-                          return [
-                            // staff details view
-                            staffDetailsPage(
-                              modalSheetContext,
-                              textTheme,
-                              employee,
-                            ),
-
-                            // page edit view
-                            editStaffPage(
-                              modalSheetContext,
-                              textTheme,
-                              employee,
-                            ),
-                          ];
-                        },
-                        modalTypeBuilder: (context) {
-                          final size = MediaQuery.of(context).size.width;
-                          if (size < 400) {
-                            return WoltModalType.bottomSheet;
-                          } else {
-                            return WoltModalType.dialog;
-                          }
-                        },
-                        onModalDismissedWithBarrierTap: () {
-                          debugPrint('Closed modal sheet with barrier tap');
-                          Navigator.of(context).pop();
-                          pageIndexNotifier.value = 0;
-                        },
-                        maxDialogWidth: 560,
-                        minDialogWidth: 400,
-                        minPageHeight: 0.0,
-                        maxPageHeight: 0.9,
-                      );
-                    },
-                    trailing: Card(
-                      color: roleCardColor(employee.role),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(employee.role.toUpperCase()),
-                      ),
-                    ),
-                  );
-                },
-              ):Center(
-                child: Column(
-                  children: [
-                    const Icon(Icons.person_off),
-                    Text(
-                      "No employees. Please + add New staff.",
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
+                child: const Text(
+                  "Dashboard",
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-              );
-            },
-            error: (error, stack) {
-              debugPrint("$stack");
-              return Center(child: Text("$error"));
-            },
-            loading: () => const Center(
-              child: CircularProgressIndicator(),
-            ),
+              ),
+              const Text(" / Employees"),
+            ],
           ),
-        ],
+        ),
+      ),
+      body: currentUserStream.when(
+        data: (user) {
+          String compId = user!.companyIds.first;
+
+          return Consumer(builder: (context, ref, child) {
+            final employeesStream =
+                ref.watch(StreamCompanyEmployeesProvider(compId));
+
+            return ListView(
+              padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+              children: [
+                ListTile(
+                  title: const Text("Staff list"),
+                  subtitle: const Text("Create and manage company staff"),
+                  trailing: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(
+                          backgroundColor: Colors.lightBlue),
+                      icon: const Icon(Icons.add),
+                      label: const Text("New"),
+                      onPressed: () {
+                        WoltModalSheet.show<void>(
+                          pageIndexNotifier: pageCreateIndexNotifier,
+                          context: context,
+                          barrierDismissible: false,
+                          pageListBuilder: (modalSheetContext) {
+                            final textTheme = Theme.of(context).textTheme;
+                            return [
+                              // new staff
+                              createStaffPage(
+                                  modalSheetContext, textTheme, compId),
+                            ];
+                          },
+                          modalTypeBuilder: (context) {
+                            final size = MediaQuery.of(context).size.width;
+                            if (size < 400) {
+                              return WoltModalType.bottomSheet;
+                            } else {
+                              return WoltModalType.dialog;
+                            }
+                          },
+                          onModalDismissedWithBarrierTap: () {
+                            debugPrint('Closed modal sheet with barrier tap');
+                            Navigator.of(context).pop();
+                            pageCreateIndexNotifier.value = 0;
+                          },
+                          maxDialogWidth: 560,
+                          minDialogWidth: 400,
+                          minPageHeight: 0.0,
+                          maxPageHeight: 0.9,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                employeesStream.when(
+                  data: (employees) {
+                    return employees.isNotEmpty
+                        ? ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: employees.length,
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    const Divider(height: 0),
+                            itemBuilder: (context, index) {
+                              var employee = employees[index];
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  child: TextAvatar(
+                                    text:
+                                        '${employee.firstName} ${employee.lastName}'
+                                            .toUpperCase(),
+                                    shape: Shape.Circular,
+                                    numberLetters: 2,
+                                    upperCase: true,
+                                  ),
+                                ),
+                                title: Text(
+                                    "${employee.firstName} ${employee.lastName}"),
+                                subtitle:
+                                    Text("ID ${employee.id.toUpperCase()}"),
+                                onTap: () {
+                                  WoltModalSheet.show<void>(
+                                    pageIndexNotifier: pageIndexNotifier,
+                                    context: context,
+                                    barrierDismissible: false,
+                                    pageListBuilder: (modalSheetContext) {
+                                      final textTheme =
+                                          Theme.of(context).textTheme;
+                                      return [
+                                        // staff details view
+                                        staffDetailsPage(modalSheetContext,
+                                            textTheme, employee, compId),
+
+                                        // page edit view
+                                        editStaffPage(
+                                          modalSheetContext,
+                                          textTheme,
+                                          employee,
+                                        ),
+
+                                        // page delete view
+                                        confirmDeletePage(
+                                          modalSheetContext,
+                                          textTheme,
+                                          employee,
+                                        ),
+                                      ];
+                                    },
+                                    modalTypeBuilder: (context) {
+                                      final size =
+                                          MediaQuery.of(context).size.width;
+                                      if (size < 400) {
+                                        return WoltModalType.bottomSheet;
+                                      } else {
+                                        return WoltModalType.dialog;
+                                      }
+                                    },
+                                    onModalDismissedWithBarrierTap: () {
+                                      debugPrint(
+                                          'Closed modal sheet with barrier tap');
+                                      Navigator.of(context).pop();
+                                      pageIndexNotifier.value = 0;
+                                    },
+                                    maxDialogWidth: 560,
+                                    minDialogWidth: 400,
+                                    minPageHeight: 0.0,
+                                    maxPageHeight: 0.9,
+                                  );
+                                },
+                                trailing: Card(
+                                  color: roleCardColor(employee.role),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(employee.role.toUpperCase()),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Center(
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    height: 250,
+                                    width: 400,
+                                    color: Colors.grey.shade200,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Icon(Icons.person_add),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: FilledButton(
+                                              style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.green),
+                                              onPressed: () {
+                                                WoltModalSheet.show<void>(
+                                                  pageIndexNotifier:
+                                                      pageCreateIndexNotifier,
+                                                  context: context,
+                                                  barrierDismissible: false,
+                                                  pageListBuilder:
+                                                      (modalSheetContext) {
+                                                    final textTheme =
+                                                        Theme.of(context)
+                                                            .textTheme;
+                                                    return [
+                                                      // new staff
+                                                      createStaffPage(
+                                                          modalSheetContext,
+                                                          textTheme,
+                                                          compId),
+                                                    ];
+                                                  },
+                                                  modalTypeBuilder: (context) {
+                                                    final size =
+                                                        MediaQuery.of(context)
+                                                            .size
+                                                            .width;
+                                                    if (size < 400) {
+                                                      return WoltModalType
+                                                          .bottomSheet;
+                                                    } else {
+                                                      return WoltModalType
+                                                          .dialog;
+                                                    }
+                                                  },
+                                                  onModalDismissedWithBarrierTap:
+                                                      () {
+                                                    debugPrint(
+                                                        'Closed modal sheet with barrier tap');
+                                                    Navigator.of(context).pop();
+                                                    pageCreateIndexNotifier
+                                                        .value = 0;
+                                                  },
+                                                  maxDialogWidth: 560,
+                                                  minDialogWidth: 400,
+                                                  minPageHeight: 0.0,
+                                                  maxPageHeight: 0.9,
+                                                );
+                                              },
+                                              child: const Text("Add Staff"),
+                                            ),
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "No employees. Please tap + add new staff",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                  },
+                  error: (error, stack) {
+                    debugPrint("$stack");
+                    return Center(child: Text("$error"));
+                  },
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ],
+            );
+          });
+        },
+        error: (error, stack) {
+          debugPrint("$stack");
+          return Center(child: Text("$error"));
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

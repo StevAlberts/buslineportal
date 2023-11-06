@@ -7,7 +7,7 @@ part of 'employees_provider.dart';
 // **************************************************************************
 
 String _$streamCompanyEmployeesHash() =>
-    r'e2c000c1baba3e33fb666f9418e6ff442f71e9b3';
+    r'3d5c93a3902e2240b321f39437bd8f4f7d16f283';
 
 /// Copied from Dart SDK
 class _SystemHash {

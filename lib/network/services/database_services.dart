@@ -1,3 +1,4 @@
+import 'package:buslineportal/shared/models/company_model.dart';
 import 'package:buslineportal/shared/models/employee_model.dart';
 import 'package:buslineportal/shared/models/trip_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,10 +9,9 @@ import '../../shared/models/fleet_model.dart';
 class DatabaseService {
   final usersCollection = FirebaseFirestore.instance.collection('users');
   final requestsCollection = FirebaseFirestore.instance.collection('requests');
-
   final employeeCollection = FirebaseFirestore.instance.collection('employees');
-
   final tripsCollection = FirebaseFirestore.instance.collection('trips');
+  final companiesCollection = FirebaseFirestore.instance.collection('companies');
   final passengerTicketsCollection =
       FirebaseFirestore.instance.collection('passengerTickets');
   final luggageTicketsCollection =
@@ -32,9 +32,9 @@ class DatabaseService {
   }
 
   // create employee
-  Future<void> deleteEmployee(Employee employee) async {
+  Future<void> deleteEmployee(String employeeId) async {
     final firestore = FirebaseFirestore.instance;
-    final employeeRef = employeeCollection.doc(employee.id);
+    final employeeRef = employeeCollection.doc(employeeId);
     await employeeRef.delete();
   }
 
@@ -103,11 +103,11 @@ class DatabaseService {
     );
   }
 
-  // Stream all trips
-
-  // Stream current trip
-
-  // register new user
+  // create company
+  Future<void> createCompanyProfile(Company company) async {
+    final companyRef = companiesCollection.doc(company.id);
+    await companyRef.set(company.toJson());
+  }
 
 // Query job assigned by manager for trip
 

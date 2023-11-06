@@ -1,8 +1,13 @@
+import 'package:buslineportal/shared/models/company_model.dart';
 import 'package:buslineportal/shared/models/employee_model.dart';
 import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:buslineportal/shared/models/trip_model.dart';
 import 'package:buslineportal/shared/providers/trips/trips_provider.dart';
+import 'package:buslineportal/shared/utils/app_strings_utils.dart';
+import 'package:buslineportal/shared/utils/date_format_utils.dart';
+import 'package:buslineportal/ui/views/journeys/journey_details_view.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,8 +18,12 @@ import 'package:uuid/uuid.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../../../network/services/database_services.dart';
+import '../../../shared/models/fleet_model.dart';
+import '../../../shared/providers/company/company_provider.dart';
 import '../../../shared/providers/staff/employees_provider.dart';
-import '../../../shared/utils/role_color_utils.dart';
+import '../../../shared/providers/users/user_provider.dart';
+import '../../../shared/utils/dynamic_padding.dart';
+import '../../../shared/utils/app_color_utils.dart';
 import '../employees/employee_view.dart';
 
 final selectedEmployeesProvider = StateProvider((ref) => <Employee>{});
@@ -55,16 +64,21 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
 
   WoltModalSheetPage editTripPage(
     BuildContext modalSheetContext,
-    TextTheme textTheme,
+    TextTheme textTheme, {
     Trip? trip,
-  ) {
-    final employeesStream = ref.watch(StreamCompanyEmployeesProvider("505548"));
-
-    final selectedStaff = ref.watch(selectedEmployeesProvider);
+    required String compId,
+    required List<Fleet> buses,
+    required List destinations,
+  }) {
+    // final employeesStream = ref.watch(StreamCompanyEmployeesProvider());
+    final selectedStaff = ref.read(selectedEmployeesProvider);
+    final employeesStream = ref.watch(StreamCompanyEmployeesProvider(compId));
+    // final companyStream = ref.read(StreamCompanyProvider()).value;
+    // final tripsStream = ref.watch(StreamAllTripsProvider());
 
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
-      topBarTitle: Text('Journey Details', style: textTheme.titleLarge),
+      topBarTitle: Text('Trip Schedule', style: textTheme.titleLarge),
       isTopBarLayerAlwaysVisible: true,
       trailingNavBarWidget: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -85,7 +99,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                 child: FormBuilderSwitch(
                   name: 'status',
                   enabled: trip != null,
-                  initialValue: trip?.isMoving ?? false,
+                  initialValue: trip?.isStarted ?? false,
                   decoration: const InputDecoration(
                     labelText: 'Journey Status',
                     hintText: "Change journey status",
@@ -115,14 +129,14 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                     FormBuilderValidators.required(),
                   ]),
                   onChanged: (value) =>
-                      travelNotifier.value = value!.toIso8601String(),
+                      travelNotifier.value = value?.toIso8601String() ?? "",
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderDropdown<String>(
                   name: 'startDest',
-                  initialValue: trip?.firstName ?? '',
+                  initialValue: trip?.startDest ?? '',
                   autovalidateMode: AutovalidateMode.always,
                   decoration: const InputDecoration(
                     labelText: 'Start Destination',
@@ -131,14 +145,15 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.min(1),
-                    FormBuilderValidators.required(),
+                    FormBuilderValidators.required(
+                        errorText: "Please + add NEW ROUTES from Inventories*"),
                   ]),
                   onChanged: (value) => startDestNotifier.value = value!,
-                  items: ['Kampala', 'Lira', 'Soroti', 'Mbarara']
+                  items: destinations
                       .map(
-                        (gender) => DropdownMenuItem(
-                          value: gender,
-                          child: Text(gender.toUpperCase()),
+                        (dest) => DropdownMenuItem(
+                          value: dest.toString(),
+                          child: Text(dest.toString().toUpperCase()),
                         ),
                       )
                       .toList(),
@@ -148,7 +163,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderDropdown<String>(
                   name: 'endDest',
-                  initialValue: trip?.firstName ?? '',
+                  initialValue: trip?.endDest ?? '',
                   autovalidateMode: AutovalidateMode.always,
                   decoration: const InputDecoration(
                     labelText: 'End Destination',
@@ -157,14 +172,15 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.min(1),
-                    FormBuilderValidators.required(),
+                    FormBuilderValidators.required(
+                        errorText: "Please + add NEW ROUTES from Inventories*"),
                   ]),
                   onChanged: (value) => endDestNotifier.value = value!,
-                  items: ['Kampala', 'Lira', 'Soroti', 'Mbarara']
+                  items: destinations
                       .map(
-                        (gender) => DropdownMenuItem(
-                          value: gender,
-                          child: Text(gender.toUpperCase()),
+                        (dest) => DropdownMenuItem(
+                          value: dest.toString(),
+                          child: Text(dest.toString().toUpperCase()),
                         ),
                       )
                       .toList(),
@@ -174,7 +190,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderDropdown<String>(
                   name: 'bus',
-                  initialValue: trip?.firstName ?? '',
+                  initialValue: trip?.bus.licence ?? '',
                   autovalidateMode: AutovalidateMode.always,
                   decoration: const InputDecoration(
                     labelText: 'Select Bus',
@@ -185,11 +201,11 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                     FormBuilderValidators.required(),
                   ]),
                   onChanged: (value) => busNotifier.value = value!,
-                  items: ['UAB 123X (32")', 'UBC 456J (68")', 'UBN 111T (54")']
+                  items: buses
                       .map(
-                        (gender) => DropdownMenuItem(
-                          value: gender,
-                          child: Text(gender.toUpperCase()),
+                        (fleet) => DropdownMenuItem(
+                          value: fleet.licence,
+                          child: Text(fleet.licence.toUpperCase()),
                         ),
                       )
                       .toList(),
@@ -199,7 +215,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderTextField(
                   name: 'fare',
-                  initialValue: trip?.firstName ?? '',
+                  initialValue: trip?.fare.toString() ?? '',
                   autovalidateMode: AutovalidateMode.always,
                   decoration: const InputDecoration(
                     labelText: 'Ticket Price',
@@ -214,68 +230,6 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   onChanged: (value) => priceNotifier.value = value!,
                 ),
               ),
-              employeesStream.when(
-                data: (employees) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: employees.length,
-                    itemBuilder: (context, index) => FormBuilderSwitch(
-                      contentPadding: EdgeInsets.zero,
-                      name: employees[index].id,
-                      initialValue:
-                      selectedStaff.contains(employees[index]),
-                      title: ListTile(
-                        leading: CircleAvatar(
-                          child: TextAvatar(
-                            text:
-                            '${employees[index].firstName} ${employees[index].lastName}'
-                                .toUpperCase(),
-                            shape: Shape.Circular,
-                            numberLetters: 2,
-                            upperCase: true,
-                          ),
-                        ),
-                        title: Text(
-                            "${employees[index].firstName} ${employees[index].lastName}"),
-                        subtitle: Text(
-                          employees[index].role.toUpperCase(),
-                          style: TextStyle(
-                            color: roleTextColor(employees[index].role),
-                          ),
-                        ),
-                      ),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(),
-                      ]),
-                      onChanged: (value) {
-                        print(selectedStaff);
-                        if (value != null && value) {
-                          StateController<Set<Employee>> selectedVal =
-                          ref.read(selectedEmployeesProvider.notifier);
-                          selectedVal.state.add(employees[index]);
-                        } else {
-                          StateController<Set<Employee>> selectedVal =
-                          ref.read(selectedEmployeesProvider.notifier);
-                          selectedVal.state.remove(employees[index]);
-                        }
-                        print(selectedStaff);
-                        print(".....");
-                      },
-                    ),
-                  );
-                },
-                error: (error, stack) {
-                  debugPrint("$stack");
-                  return Center(child: Text("$error"));
-                },
-                loading: () => const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-              ),
-              // CheckboxListTile( title:Text("keke"),value: false, onChanged: (value){}),
               ExpansionTile(
                 title: const ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -285,53 +239,91 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                 children: [
                   employeesStream.when(
                     data: (employees) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: employees.length,
-                        itemBuilder: (context, index) => FormBuilderSwitch(
-                          contentPadding: EdgeInsets.zero,
-                          name: employees[index].id,
-                          initialValue:
-                              selectedStaff.contains(employees[index]),
-                          title: ListTile(
-                            leading: CircleAvatar(
-                              child: TextAvatar(
-                                text:
-                                    '${employees[index].firstName} ${employees[index].lastName}'
-                                        .toUpperCase(),
-                                shape: Shape.Circular,
-                                numberLetters: 2,
-                                upperCase: true,
+                      return employees.isNotEmpty
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: employees.length,
+                              itemBuilder: (context, index) =>
+                                  FormBuilderSwitch(
+                                contentPadding: EdgeInsets.zero,
+                                name: employees[index].id,
+                                initialValue:
+                                    selectedStaff.contains(employees[index]),
+                                title: ListTile(
+                                  leading: CircleAvatar(
+                                    child: TextAvatar(
+                                      text:
+                                          '${employees[index].firstName} ${employees[index].lastName}'
+                                              .toUpperCase(),
+                                      shape: Shape.Circular,
+                                      numberLetters: 2,
+                                      upperCase: true,
+                                    ),
+                                  ),
+                                  title: Text(
+                                      "${employees[index].firstName} ${employees[index].lastName}"),
+                                  subtitle: Text(
+                                    employees[index].role.toUpperCase(),
+                                    style: TextStyle(
+                                      color:
+                                          roleTextColor(employees[index].role),
+                                    ),
+                                  ),
+                                ),
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                                onChanged: (value) {
+                                  if (value != null && value) {
+                                    StateController<Set<Employee>> selectedVal =
+                                        ref.read(
+                                            selectedEmployeesProvider.notifier);
+                                    selectedVal.state.add(employees[index]);
+                                  } else {
+                                    StateController<Set<Employee>> selectedVal =
+                                        ref.read(
+                                            selectedEmployeesProvider.notifier);
+                                    selectedVal.state.remove(employees[index]);
+                                  }
+                                },
                               ),
-                            ),
-                            title: Text(
-                                "${employees[index].firstName} ${employees[index].lastName}"),
-                            subtitle: Text(
-                              employees[index].role.toUpperCase(),
-                              style: TextStyle(
-                                color: roleTextColor(employees[index].role),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Center(
+                                child: Container(
+                                  height: 200,
+                                  width: 300,
+                                  color: Colors.grey.shade200,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: FilledButton(
+                                            style: FilledButton.styleFrom(
+                                                backgroundColor: Colors.green),
+                                            onPressed: () =>
+                                                context.go("/employees"),
+                                            child: const Text("Open Employees"),
+                                          ),
+                                        ),
+                                        const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "No employees. Please go to Employees and add Staff",
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          validator: FormBuilderValidators.compose([
-                            FormBuilderValidators.required(),
-                          ]),
-                          onChanged: (value) {
-                            print(selectedStaff);
-                            if (value != null && value) {
-                              StateController<Set<Employee>> selectedVal =
-                                  ref.read(selectedEmployeesProvider.notifier);
-                              selectedVal.state.add(employees[index]);
-                            } else {
-                              StateController<Set<Employee>> selectedVal =
-                                  ref.read(selectedEmployeesProvider.notifier);
-                              selectedVal.state.remove(employees[index]);
-                            }
-                            print(selectedStaff);
-                            print(".....");
-                          },
-                        ),
-                      );
+                            );
                     },
                     error: (error, stack) {
                       debugPrint("$stack");
@@ -343,7 +335,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                         child: CircularProgressIndicator(),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
@@ -354,25 +346,20 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   onPressed: () {
                     var uuid = const Uuid().v4();
 
-                    /// TODO: get ID from UserDetails
-                    var companyId = OTP.generateTOTPCodeString(
-                      "JBSWY3DPEHPK3PXP",
-                      1362302550000,
-                    ); // -> '505548'
                     var uuidString = uuid.toString();
                     var tripId = uuidString.substring(0, 6);
 
-                    var status = trip?.isMoving ?? statusNotifier.value;
+                    var status = trip?.isStarted ?? statusNotifier.value;
                     var travelDate = trip?.travelDate.toIso8601String() ??
                         travelNotifier.value;
-                    var startDest = trip?.lastName ?? startDestNotifier.value;
-                    var endDest = trip?.gender ?? endDestNotifier.value;
-                    var bus = trip?.phone ?? busNotifier.value;
-                    var price = trip?.role ?? priceNotifier.value;
+                    var startDest = trip?.startDest ?? startDestNotifier.value;
+                    var endDest = trip?.endDest ?? endDestNotifier.value;
+                    var price = trip?.fare.toString() ?? priceNotifier.value;
 
-                    var busNo = trip?.busNo ?? busNotifier.value;
-                    var busSeats =
-                        trip?.busSeats.toString() ?? busNotifier.value;
+                    var licence = trip?.bus.licence ?? busNotifier.value;
+
+                    // var busSeats =
+                    //     trip?.busSeats.toString() ?? busNotifier.value;
 
                     var staffDetails = trip?.staffDetails ??
                         selectedStaff
@@ -383,21 +370,27 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                     if (travelDate.isNotEmpty &&
                         startDest.isNotEmpty &&
                         endDest.isNotEmpty &&
-                        bus.isNotEmpty &&
+                        licence.isNotEmpty &&
                         price.isNotEmpty &&
                         staffDetails.isNotEmpty) {
+                      var bus = buses
+                          .firstWhere((element) => element.licence == licence);
+
                       // create trip model
                       var trip0 = Trip(
                         id: tripId,
-                        companyId: companyId,
+                        companyId: compId,
                         companyDetails: null,
-                        busNo: busNo,
-                        busSeats: 0,
+                        bus: bus,
+                        fare: int.parse(price),
                         staffDetails: staffDetails,
                         startDest: startDest,
                         endDest: endDest,
-                        isMoving: status,
+                        isStarted: status,
                         travelDate: DateTime.parse(travelDate),
+                        passengers: [],
+                        departure: null,
+                        arrival: null,
                       );
 
                       if (trip == null) {
@@ -476,7 +469,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
     );
   }
 
-  void _showNewTripDialog() {
+  void showTripDialog(Company company) {
     WoltModalSheet.show<void>(
       pageIndexNotifier: pageIndexNotifier,
       context: context,
@@ -484,18 +477,14 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
       pageListBuilder: (modalSheetContext) {
         final textTheme = Theme.of(context).textTheme;
         return [
-          // staff details view
-          // staffDetailsPage(
-          //   modalSheetContext,
-          //   textTheme,
-          //   employee,
-          // ),
-
           // create trip view
           editTripPage(
             modalSheetContext,
             textTheme,
-            null,
+            trip: null,
+            buses: company.fleet,
+            destinations: company.destinations.toList(),
+            compId: company.id,
           ),
         ];
       },
@@ -521,71 +510,194 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
 
   @override
   Widget build(BuildContext context) {
-    final tripsStream = ref.watch(StreamAllTripsProvider("505548"));
+    final selectedStaff = ref.watch(selectedEmployeesProvider);
+
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+
+    final currentUserStream =
+        ref.read(StreamCurrentUserProvider(firebaseUser!.uid));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Journey"),
+        title: Padding(
+          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  context.pushReplacement('/');
+                },
+                child: const Text(
+                  "Dashboard",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+              const Text(" / Journeys"),
+            ],
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showNewTripDialog,
-        icon: const Icon(Icons.add),
-        label: const Text("New Trip"),
-      ),
-      body: ListView(
-        children: [
-          const ListTile(
-            title: Text("Journey history"),
-          ),
-          tripsStream.when(
-            data: (trips) {
-              return trips.isNotEmpty
-                  ? ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: trips.length,
-                      itemBuilder: (context, index) => ListTile(
-                        title: const Text("Trip name"),
-                        subtitle: const Text("destination"),
-                        trailing: Text("${(index + 1) * 21}"),
-                        onTap: () {
-                          context.go("/journey_details");
-                        },
+      body: currentUserStream.when(
+        data: (user) {
+          return Consumer(builder: (context, ref, child) {
+            String compId = user?.companyIds.first;
+
+            /// TODO: likely to give NULL
+            final company =
+                ref.watch(StreamCompanyProvider(compId)).valueOrNull;
+            final employeesStream =
+                ref.watch(StreamCompanyEmployeesProvider(compId)).valueOrNull;
+            final tripsStream = ref.watch(StreamAllTripsProvider(compId));
+
+            return ListView(
+              padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+              children: [
+                ListTile(
+                  title: const Text("Journey history"),
+                  trailing: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FilledButton.icon(
+                      onPressed: () => showTripDialog(company!),
+                      icon: const Icon(Icons.add),
+                      label: const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("Schedule Trip"),
                       ),
-                    )
-                  : Center(
-                      child: Column(
-                        children: [
-                          const Icon(Icons.hourglass_empty),
-                          Text(
-                            "No Trips",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ],
-                      ),
-                    );
-            },
-            error: (error, strace) {
-              print(strace);
-              print(error);
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    error.toString(),
+                    ),
                   ),
                 ),
-              );
-            },
-            loading: () => const Center(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          ),
-        ],
+                tripsStream.when(
+                  data: (trips) {
+                    print("Trips: ${trips.length}");
+                    return trips.isNotEmpty
+                        ? ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            separatorBuilder: (context, index) =>
+                                const Divider(height: 0),
+                            itemCount: trips.length,
+                            itemBuilder: (context, index) {
+                              Trip trip = trips[index];
+                              return Card(
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.all(10.0),
+                                  title: Text(
+                                    "${trip.startDest.toUpperCase()} - ${trip.endDest.toUpperCase()}",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "ID ${trip.id.toUpperCase()}",
+                                      ),
+                                      Text(
+                                        travelDateFormat(trip.travelDate),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        journeyStatusText(
+                                          trip.isStarted,
+                                          trip.departure == null,
+                                        ),
+                                        style: TextStyle(
+                                          color: journeyStatusColors(
+                                            trip.isStarted,
+                                            trip.departure == null,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Icon(
+                                          Icons.circle,
+                                          size: 20,
+                                          color: journeyStatusColors(
+                                            trip.isStarted,
+                                            trip.departure == null,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    // context.go("/journey_details/${trip.id}",
+                                    //     extra: trips);
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            JourneyDetailsView(trip: trip),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 200,
+                              width: 300,
+                              color: Colors.grey.shade200,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: FilledButton(
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: Colors.green),
+                                        onPressed: () =>
+                                            showTripDialog(company!),
+                                        child: const Text("Schedule Trip"),
+                                      ),
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Text(
+                                        "No previous trips. Please click to add New Trip to create a Journey",
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                  },
+                  error: (error, stack) {
+                    debugPrint("$stack");
+                    return Center(child: Text("$error"));
+                  },
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ],
+            );
+          });
+        },
+        error: (error, stack) {
+          debugPrint("$stack");
+          return Center(child: Text("$error"));
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(),
+        ),
       ),
     );
   }

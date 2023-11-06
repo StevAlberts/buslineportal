@@ -6,7 +6,7 @@ part of 'user_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamUserRequestHash() => r'defd514038db223d0b4f131c8900b363cfa04da9';
+String _$streamUserRequestHash() => r'31f80945b9a899e74345ec78990e30cfdec591f0';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -40,7 +40,7 @@ class StreamUserRequestFamily extends Family<AsyncValue<UserRequestModel?>> {
 
   /// See also [streamUserRequest].
   StreamUserRequestProvider call(
-    String uid,
+    String? uid,
   ) {
     return StreamUserRequestProvider(
       uid,
@@ -76,7 +76,7 @@ class StreamUserRequestProvider
     extends AutoDisposeStreamProvider<UserRequestModel?> {
   /// See also [streamUserRequest].
   StreamUserRequestProvider(
-    String uid,
+    String? uid,
   ) : this._internal(
           (ref) => streamUserRequest(
             ref as StreamUserRequestRef,
@@ -104,7 +104,7 @@ class StreamUserRequestProvider
     required this.uid,
   }) : super.internal();
 
-  final String uid;
+  final String? uid;
 
   @override
   Override overrideWith(
@@ -145,7 +145,7 @@ class StreamUserRequestProvider
 
 mixin StreamUserRequestRef on AutoDisposeStreamProviderRef<UserRequestModel?> {
   /// The parameter `uid` of this provider.
-  String get uid;
+  String? get uid;
 }
 
 class _StreamUserRequestProviderElement
@@ -154,7 +154,136 @@ class _StreamUserRequestProviderElement
   _StreamUserRequestProviderElement(super.provider);
 
   @override
-  String get uid => (origin as StreamUserRequestProvider).uid;
+  String? get uid => (origin as StreamUserRequestProvider).uid;
+}
+
+String _$streamCurrentUserHash() => r'2e85504170ef63a142ca1a502079947669b5d9b7';
+
+/// See also [streamCurrentUser].
+@ProviderFor(streamCurrentUser)
+const streamCurrentUserProvider = StreamCurrentUserFamily();
+
+/// See also [streamCurrentUser].
+class StreamCurrentUserFamily extends Family<AsyncValue<UserModel?>> {
+  /// See also [streamCurrentUser].
+  const StreamCurrentUserFamily();
+
+  /// See also [streamCurrentUser].
+  StreamCurrentUserProvider call(
+    String? uid,
+  ) {
+    return StreamCurrentUserProvider(
+      uid,
+    );
+  }
+
+  @override
+  StreamCurrentUserProvider getProviderOverride(
+    covariant StreamCurrentUserProvider provider,
+  ) {
+    return call(
+      provider.uid,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'streamCurrentUserProvider';
+}
+
+/// See also [streamCurrentUser].
+class StreamCurrentUserProvider extends AutoDisposeStreamProvider<UserModel?> {
+  /// See also [streamCurrentUser].
+  StreamCurrentUserProvider(
+    String? uid,
+  ) : this._internal(
+          (ref) => streamCurrentUser(
+            ref as StreamCurrentUserRef,
+            uid,
+          ),
+          from: streamCurrentUserProvider,
+          name: r'streamCurrentUserProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$streamCurrentUserHash,
+          dependencies: StreamCurrentUserFamily._dependencies,
+          allTransitiveDependencies:
+              StreamCurrentUserFamily._allTransitiveDependencies,
+          uid: uid,
+        );
+
+  StreamCurrentUserProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.uid,
+  }) : super.internal();
+
+  final String? uid;
+
+  @override
+  Override overrideWith(
+    Stream<UserModel?> Function(StreamCurrentUserRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: StreamCurrentUserProvider._internal(
+        (ref) => create(ref as StreamCurrentUserRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        uid: uid,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<UserModel?> createElement() {
+    return _StreamCurrentUserProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StreamCurrentUserProvider && other.uid == uid;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, uid.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin StreamCurrentUserRef on AutoDisposeStreamProviderRef<UserModel?> {
+  /// The parameter `uid` of this provider.
+  String? get uid;
+}
+
+class _StreamCurrentUserProviderElement
+    extends AutoDisposeStreamProviderElement<UserModel?>
+    with StreamCurrentUserRef {
+  _StreamCurrentUserProviderElement(super.provider);
+
+  @override
+  String? get uid => (origin as StreamCurrentUserProvider).uid;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

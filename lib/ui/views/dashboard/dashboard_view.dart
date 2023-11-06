@@ -1,4 +1,6 @@
 import 'package:buslineportal/shared/models/user_model.dart';
+import 'package:buslineportal/shared/providers/company/company_provider.dart';
+import 'package:buslineportal/shared/providers/trips/trips_provider.dart';
 import 'package:buslineportal/shared/providers/users/user_provider.dart';
 import 'package:buslineportal/shared/utils/dynamic_padding.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
@@ -8,17 +10,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
+import '../../../shared/models/trip_model.dart';
+import '../../../shared/models/user_request_model.dart';
 import '../../../shared/providers/auth/auth_provider.dart';
+import '../../../shared/utils/app_color_utils.dart';
+import '../../../shared/utils/app_strings_utils.dart';
+import '../../../shared/utils/date_format_utils.dart';
+import '../journeys/journey_details_view.dart';
 
 class DashboardView extends ConsumerWidget {
   const DashboardView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var firebaseUSer = FirebaseAuth.instance.currentUser;
     final authNotifier = ref.read(authProvider.notifier);
     final pageIndexNotifier = ValueNotifier(0);
-    final streamUser = ref.watch(streamUserRequestProvider(firebaseUSer!.uid));
+
+    var firebaseUSer = FirebaseAuth.instance.currentUser;
+    final streamUser = ref.watch(StreamCurrentUserProvider(firebaseUSer!.uid));
 
     Future<void> logoutDialog() {
       return showDialog(
@@ -56,7 +65,7 @@ class DashboardView extends ConsumerWidget {
     WoltModalSheetPage profileDialogPage(
       BuildContext modalSheetContext,
       TextTheme textTheme,
-      UserRequestModel? user,
+      UserModel? user,
     ) {
       return WoltModalSheetPage.withSingleChild(
         hasSabGradient: false,
@@ -85,7 +94,13 @@ class DashboardView extends ConsumerWidget {
                 ),
                 title: Text("${user?.firstName} ${user?.lastName}"),
                 subtitle: Text("${user?.email}"),
-                trailing: const Text("ROLE"),
+                trailing: Card(
+                  color: roleCardColor(user!.role!),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(user.role!.toUpperCase()),
+                  ),
+                ),
               ),
               const Divider(),
               FilledButton(
@@ -103,10 +118,13 @@ class DashboardView extends ConsumerWidget {
     return streamUser.when(
       data: (user) => Scaffold(
         appBar: AppBar(
-          title: const Text("Dashboard"),
+          title: Padding(
+            padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
+            child: const Text("Dashboard"),
+          ),
           actions: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.only(right: paddingBarWidth(context)),
               child: InkWell(
                 onTap: () {
                   WoltModalSheet.show<void>(
@@ -143,7 +161,7 @@ class DashboardView extends ConsumerWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text("${user?.firstName!.toUpperCase()}"),
+                      child: Text("${user?.firstName?.toUpperCase()}"),
                     ),
                     CircleAvatar(
                       child: TextAvatar(
@@ -173,7 +191,10 @@ class DashboardView extends ConsumerWidget {
                   onPressed: () {
                     context.go('/employees');
                   },
-                  child: const Text("View"),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("View"),
+                  ),
                 ),
               ),
               ListTile(
@@ -184,7 +205,10 @@ class DashboardView extends ConsumerWidget {
                   onPressed: () {
                     context.go('/journeys');
                   },
-                  child: const Text("View"),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("View"),
+                  ),
                 ),
               ),
               ListTile(
@@ -195,51 +219,166 @@ class DashboardView extends ConsumerWidget {
                   onPressed: () {
                     context.go("/inventories");
                   },
-                  child: const Text("View"),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text("View"),
+                  ),
                 ),
               ),
               const Divider(),
-              ListTile(
-                title: Text(
-                  "Current trips",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: 10,
-                itemBuilder: (context, index) => ListTile(
-                  title: const Text("Trip name"),
-                  subtitle: const Text("destination"),
-                  leading: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.circle,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
+              Consumer(
+                builder: (context, ref, child) {
+                  // final companyData =
+                  //     ref.read(StreamCompanyProvider(user!.companyIds.first));
+
+                  final currentTripsStream = ref
+                      .watch(StreamMovingTripsProvider(user?.companyIds.first));
+
+                  return Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text("${(index + 1) * 21}"),
+                      ListTile(
+                        title: Text(
+                          "Current trips",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
                       ),
-                      const Icon(Icons.event_seat),
+                      currentTripsStream.when(
+                        data: (trips) {
+                          return trips.isNotEmpty
+                              ? ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  separatorBuilder: (context, index) =>
+                                      const Divider(height: 0),
+                                  itemCount: trips.length,
+                                  itemBuilder: (context, index) {
+                                    Trip trip = trips[index];
+                                    return Card(
+                                      child: ListTile(
+                                        contentPadding:
+                                            const EdgeInsets.all(10.0),
+                                        title: Text(
+                                          "${trip.startDest.toUpperCase()} - ${trip.endDest.toUpperCase()}",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                        subtitle: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "ID ${trip.id.toUpperCase()}",
+                                            ),
+                                            Text(
+                                              travelDateFormat(trip.travelDate),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium,
+                                            ),
+                                          ],
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              journeyStatusText(
+                                                trip.isStarted,
+                                                trip.departure == null,
+                                              ),
+                                              style: TextStyle(
+                                                color: journeyStatusColors(
+                                                  trip.isStarted,
+                                                  trip.departure == null,
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Icon(
+                                                Icons.circle,
+                                                size: 20,
+                                                color: journeyStatusColors(
+                                                  trip.isStarted,
+                                                  trip.departure == null,
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        onTap: () {
+                                          // context.go("/journey_details/${trip.id}",
+                                          //     extra: trips);
+
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  JourneyDetailsView(
+                                                      trip: trip),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  },
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    height: 300,
+                                    width: 500,
+                                    color: Colors.grey.shade200,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(10.0),
+                                            child: FilledButton(
+                                              style: FilledButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.green),
+                                              onPressed: () {
+                                                context.go('/journeys');
+                                              },
+                                              child:
+                                                  const Text("Open Journeys"),
+                                            ),
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.all(10.0),
+                                            child: Text(
+                                              "No current trips. Please add create a new Trip from Journeys",
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                        },
+                        error: (error, stack) {
+                          debugPrint("$error");
+                          return Center(child: Text("$error"));
+                        },
+                        loading: () => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
                     ],
-                  ),
-                  onTap: () {
-                    context.go("/journey_details");
-                  },
-                ),
+                  );
+                },
               ),
             ],
           ),
         ),
       ),
       error: (error, stack) {
-        debugPrint("$stack");
+        debugPrint("$error");
         return Scaffold(
           body: Center(child: Text("$error")),
         );

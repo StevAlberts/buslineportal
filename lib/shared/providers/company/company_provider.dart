@@ -10,13 +10,16 @@ var companyCollection = FirebaseFirestore.instance.collection('companies');
 
 @riverpod
 Stream<Company?> streamCompany(
-    StreamCompanyRef ref,
-    String companyId,
-    ) {
-  var ticketStream = companyCollection
-      .doc(companyId)
-      .snapshots()
-      .map((snapshot) => Company.fromJson(snapshot.data()));
+  StreamCompanyRef ref,
+  String? companyId,
+) {
+  if (companyId != null) {
+    var ticketStream = companyCollection
+        .doc(companyId)
+        .snapshots()
+        .map((snapshot) => Company.fromJson(snapshot.data()));
 
-  return ticketStream;
+    return ticketStream;
+  }
+  return const Stream.empty();
 }

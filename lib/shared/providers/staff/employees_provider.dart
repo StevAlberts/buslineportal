@@ -14,7 +14,7 @@ Stream<List<Employee>> streamCompanyEmployees(
 
   var employeeStream = employeesCollection
       .where('companyId', isEqualTo: companyId)
-      // .orderBy('timestamp', descending: true)
+      .orderBy('timestamp', descending: true)
       .snapshots()
       .map((snapshot) => snapshot.docs
       .map((doc) => Employee.fromJson(doc.data()))

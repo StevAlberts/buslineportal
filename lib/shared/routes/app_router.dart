@@ -1,4 +1,5 @@
 // GoRouter configuration
+import 'package:buslineportal/ui/app_index.dart';
 import 'package:buslineportal/ui/views/auth/auth_view.dart';
 import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
 import 'package:buslineportal/ui/views/employees/employee_view.dart';
@@ -14,12 +15,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../ui/views/profile/create_profile_view.dart';
-
+import '../models/trip_model.dart';
 
 appRouterConfig(User? firebaseUser) => GoRouter(
       initialLocation: firebaseUser == null ? '/login' : '/',
       redirect: (context, GoRouterState state) {
-        print("firebaseCurrentUser: ${FirebaseAuth.instance.currentUser?.email}");
         if (firebaseUser == null) {
           return '/login';
         } else {
@@ -29,11 +29,15 @@ appRouterConfig(User? firebaseUser) => GoRouter(
       routes: [
         GoRoute(
           path: '/',
-          builder: (context, state) => const DashboardView(),
+          builder: (context, state) => const AppIndex(),
         ),
         GoRoute(
           path: '/login',
           builder: (context, state) => AuthView(),
+        ),
+        GoRoute(
+          path: '/dashboard',
+          builder: (context, state) => const DashboardView(),
         ),
         GoRoute(
           path: '/create_profile',
@@ -47,10 +51,22 @@ appRouterConfig(User? firebaseUser) => GoRouter(
           path: '/journeys',
           builder: (context, state) => const JourneyView(),
         ),
-        GoRoute(
-          path: '/journey_details',
-          builder: (context, state) => const JourneyDetailsView(),
-        ),
+        // GoRoute(
+        //   path: '/journey_details',
+        //   builder: (context, state) => const JourneyDetailsView(),
+        // ),
+        // GoRoute(
+        //   path: '/journey_details/:trip_id',
+        //   builder: (context, state) {
+        //     final tripId = state.pathParameters['trip_id'];
+        //     final trips = state.extra as List<Trip>?;
+        //     // Get the trip object from the list of trips.
+        //     final trip = trips?.firstWhere((trip) => trip.id == tripId);
+        //
+        //     // Return the JourneyDetailsPage widget.
+        //     return JourneyDetailsView(trip: trip);
+        //   },
+        // ),
         GoRoute(
           path: '/inventories',
           builder: (context, state) => const InventoriesView(),

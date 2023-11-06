@@ -5,9 +5,9 @@ String dobDateFormat(DateTime date) {
   return dateFormat.format(date);
 }
 
-String travelDateFormat(DateTime date){
+String travelDateFormat(DateTime? date){
   DateFormat dateFormat = DateFormat("EEE dd-MM-yyyy  @ hh:mm a");
-  return dateFormat.format(date);
+  return date!=null? dateFormat.format(date):"null";
 }
 
 String systemDateFormat(DateTime date){

@@ -23,3 +23,17 @@ Color roleTextColor(String role) {
   }
   return color;
 }
+
+Color journeyStatusColors(bool isStarted, bool scheduled) {
+  Color? color;
+  if(scheduled){
+    color = Colors.grey;
+  }else{
+    if (isStarted) {
+      color = Colors.green;
+    } else {
+      color = Colors.red;
+    }
+  }
+  return color;
+}

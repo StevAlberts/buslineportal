@@ -7,7 +7,7 @@ class Employee {
   String lastName;
   String gender;
   DateTime dob;
-  String nin;
+  String? nin;
   String phone;
   String role;
   bool isOnline;
@@ -22,7 +22,7 @@ class Employee {
     required this.lastName,
     required this.gender,
     required this.dob,
-    required this.nin,
+    this.nin,
     required this.phone,
     required this.role,
     required this.isOnline,
@@ -37,7 +37,7 @@ class Employee {
     lastName: json["lastName"],
     gender: json["gender"],
     dob: json["dob"].toDate(),
-    nin: json["nin"],
+    nin: null,
     role: json["role"],
     phone: json["phone"]??"",
     isOnline: json["isOnline"]??false,
@@ -52,7 +52,7 @@ class Employee {
     "lastName": lastName,
     "gender": gender,
     "dob": dob,
-    "nin": nin,
+    "nin": null,
     "role": role,
     "phone":phone,
     "isOnline": isOnline,

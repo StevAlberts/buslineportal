@@ -4,61 +4,85 @@
 
 import 'dart:convert';
 
+import 'package:buslineportal/shared/models/passenger_model.dart';
 import 'package:buslineportal/shared/models/staff_model.dart';
+
+import 'fleet_model.dart';
 
 Trip tripFromJson(String str) => Trip.fromJson(json.decode(str));
 
 String tripToJson(Trip data) => json.encode(data.toJson());
 
-class Trip extends StaffDetail {
+class Trip {
   String id;
   String companyId;
   CompanyDetails? companyDetails;
-  String busNo;
-  int busSeats;
   List<StaffDetail> staffDetails;
+  List<Passenger> passengers;
+  Fleet bus;
   String startDest;
   String endDest;
-  bool isMoving;
+  bool isStarted;
+  int fare;
   DateTime travelDate;
+  DateTime? departure;
+  DateTime? arrival;
 
   Trip({
     required this.id,
     required this.companyId,
-     this.companyDetails,
-    required this.busNo,
-    required this.busSeats,
+    this.companyDetails,
+    required this.bus,
     required this.staffDetails,
     required this.startDest,
     required this.endDest,
-    required this.isMoving,
+    required this.isStarted,
+    required this.fare,
+    required this.passengers,
+    required this.departure,
+    required this.arrival,
     required this.travelDate,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) => Trip(
         id: json["id"],
         companyId: json["companyId"],
-        companyDetails: CompanyDetails.fromJson(json["companyDetails"]),
-        busNo: json["busNo"],
-        busSeats: json["busSeats"],
-        staffDetails: List<StaffDetail>.from(
-            json["staffDetails"].map((x) => StaffDetail.fromJson(x))),
+        companyDetails: json["companyDetails"] != null
+            ? CompanyDetails.fromJson(json["companyDetails"])
+            : null,
+        bus: Fleet.fromJson(json["bus"]),
+        staffDetails: json["staff"] != null
+            ? List<StaffDetail>.from(
+                json["staff"].map((x) => StaffDetail.fromJson(x)))
+            : [],
+        passengers: json["passengers"] != null
+            ? List<Passenger>.from(
+                json["passengers"].map((data) => Passenger.fromJson(data)))
+            : [],
+        fare: json["fare"],
         startDest: json["startDest"],
         endDest: json["endDest"],
-        isMoving: json["isMoving"],
-        travelDate: json["travelDate"],
+        isStarted: json["isStarted"] ?? false,
+        departure:
+            json["departure"] != null ? json!["departure"].toDate() : null,
+        arrival: json["arrival"] != null ? json!["arrival"].toDate() : null,
+        travelDate: json["travelDate"].toDate(),
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "companyId": companyId,
         "companyDetails": companyDetails?.toJson(),
-        "busNo": busNo,
-        "busSeats": busSeats,
-        "staffDetails": List<dynamic>.from(staffDetails.map((x) => x.toJson())),
+        "bus": bus.toJson(),
+        "staff": List<dynamic>.from(staffDetails.map((x) => x.toJson())),
+        "passengers":
+            List<dynamic>.from(passengers.map((data) => data.toJson())),
         "startDest": startDest,
         "endDest": endDest,
-        "isMoving": isMoving,
+        "isStarted": isStarted,
+        "fare": fare,
+        "departure": departure,
+        "arrival": arrival,
         "travelDate": travelDate,
       };
 }
@@ -88,5 +112,49 @@ class CompanyDetails {
         "email": email,
         "contact": contact,
         "imgURL": imgUrl,
+      };
+}
+
+Bus fleetFromJson(String str) => Bus.fromJson(json.decode(str));
+
+String fleetToJson(Bus data) => json.encode(data.toJson());
+
+class Bus {
+  String id;
+  String companyId;
+  String licence;
+  String make;
+  String model;
+  int year;
+  int capacity;
+
+  Bus({
+    required this.id,
+    required this.companyId,
+    required this.licence,
+    required this.make,
+    required this.model,
+    required this.year,
+    required this.capacity,
+  });
+
+  factory Bus.fromJson(Map<String, dynamic> json) => Bus(
+        id: json["id"],
+        companyId: json["companyId"],
+        licence: json["licence"],
+        make: json["make"],
+        model: json["model"],
+        year: json["year"],
+        capacity: json["capacity"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "companyId": companyId,
+        "licence": licence,
+        "make": make,
+        "model": model,
+        "year": year,
+        "capacity": capacity,
       };
 }

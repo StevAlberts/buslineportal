@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../shared/utils/dynamic_padding.dart';
+
 class PassengerTicketsView extends StatelessWidget {
   const PassengerTicketsView({Key? key}) : super(key: key);
 
@@ -28,6 +30,7 @@ class PassengerTicketsView extends StatelessWidget {
       ),
       body: ListView.builder(
         itemCount: 78,
+        padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
         itemBuilder: (context, index) => ListTile(
           title: const Text("Passenger names"),
           subtitle: const Text("destination"),

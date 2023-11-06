@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../shared/utils/dynamic_padding.dart';
+
 class CreateProfileView extends StatelessWidget {
   CreateProfileView({Key? key}) : super(key: key);
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -21,7 +23,7 @@ class CreateProfileView extends StatelessWidget {
         title: const Text("Account Registration"),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(8.0),
+        padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
         children: [
           Form(
             key: _formKey,

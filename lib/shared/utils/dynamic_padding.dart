@@ -9,10 +9,27 @@ double paddingWidth(context) {
     val = 8.0;
   } else if (screenWidth < 1200) {
     // For medium-sized screens
-    val = screenWidth * 0.05;
+    val = screenWidth * 0.1;
   } else {
     // For larger screens
-    val = screenWidth * 0.1;
+    val = screenWidth * 0.25;
+  }
+  return val;
+}
+
+double paddingBarWidth(context) {
+  double screenWidth = MediaQuery.of(context).size.width;
+
+  double val;
+  if (screenWidth < 600) {
+    // For smaller screens
+    val = 8.0;
+  } else if (screenWidth < 1200) {
+    // For medium-sized screens
+    val = screenWidth * 0.08;
+  } else {
+    // For larger screens
+    val = screenWidth * 0.2;
   }
   return val;
 }

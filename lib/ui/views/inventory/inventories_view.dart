@@ -1,6 +1,7 @@
 import 'package:buslineportal/network/services/database_services.dart';
 import 'package:buslineportal/shared/providers/company/company_provider.dart';
 import 'package:buslineportal/shared/providers/trips/trips_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +10,8 @@ import 'package:go_router/go_router.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../../../shared/models/fleet_model.dart';
+import '../../../shared/providers/users/user_provider.dart';
+import '../../../shared/utils/dynamic_padding.dart';
 
 class InventoriesView extends ConsumerStatefulWidget {
   const InventoriesView({Key? key}) : super(key: key);
@@ -50,6 +53,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
     BuildContext modalSheetContext,
     TextTheme textTheme,
     String? destination,
+    String companyId,
   ) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
@@ -94,7 +98,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               child: FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: Colors.red),
                 onPressed: () {
-                  databaseService.deleteRoute(destination!, "505548");
+                  databaseService.deleteRoute(destination!, companyId);
                   Navigator.pop(modalSheetContext);
                 },
                 child: const Padding(
@@ -111,7 +115,11 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
                   print("New dest: $newDest");
 
                   if (newDest.isNotEmpty) {
-                    databaseService.createRoute(newDest, '505548');
+                    databaseService
+                        .createRoute(newDest, companyId)
+                        .onError((error, stackTrace) {
+                      print("New error: $error");
+                    });
                     // clean
                     destNotifier.value = "";
                     // pop sheet
@@ -147,6 +155,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
     BuildContext modalSheetContext,
     TextTheme textTheme,
     Fleet? fleet,
+      String companyId
   ) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
@@ -187,23 +196,6 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FormBuilderTextField(
-                name: 'Make',
-                enabled: fleet == null,
-                initialValue: fleet?.make ?? "",
-                autovalidateMode: AutovalidateMode.always,
-                validator: FormBuilderValidators.compose([
-                  FormBuilderValidators.required(),
-                ]),
-                onChanged: (value) => makeNotifier.value = value!,
-                decoration: const InputDecoration(
-                    icon: Icon(Icons.travel_explore),
-                    labelText: 'Make',
-                    hintText: "Enter make of the vehicle"),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FormBuilderTextField(
                 name: 'Model',
                 enabled: fleet == null,
                 initialValue: fleet?.model ?? "",
@@ -216,6 +208,23 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
                     icon: Icon(Icons.directions_bus),
                     labelText: 'Model',
                     hintText: "Enter model of the vehicle"),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FormBuilderTextField(
+                name: 'Make',
+                enabled: fleet == null,
+                initialValue: fleet?.make ?? "",
+                autovalidateMode: AutovalidateMode.always,
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                ]),
+                onChanged: (value) => makeNotifier.value = value!,
+                decoration: const InputDecoration(
+                    icon: Icon(Icons.travel_explore),
+                    labelText: 'Make',
+                    hintText: "Enter make of the vehicle"),
               ),
             ),
             Padding(
@@ -262,7 +271,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
               child: FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: Colors.red),
                 onPressed: () {
-                  databaseService.deleteFleet(fleet!, "505548");
+                  databaseService.deleteFleet(fleet!, companyId);
                   Navigator.pop(modalSheetContext);
                 },
                 child: const Padding(
@@ -299,7 +308,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
                       capacity: int.parse(capacity),
                     );
                     // add
-                    databaseService.createFleet(fleet0, '505548');
+                    databaseService.createFleet(fleet0, companyId);
                     // clean
                     destNotifier.value = "";
                     // pop sheet
@@ -331,7 +340,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
     );
   }
 
-  void showRouteDialog({String? destination}) {
+  void showRouteDialog(companyId, {String? destination}) {
     WoltModalSheet.show<void>(
       pageIndexNotifier: pageIndexNotifier,
       context: context,
@@ -339,7 +348,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
       pageListBuilder: (modalSheetContext) {
         final textTheme = Theme.of(context).textTheme;
         return [
-          newRoutePage(modalSheetContext, textTheme, destination),
+          newRoutePage(modalSheetContext, textTheme, destination, companyId),
         ];
       },
       modalTypeBuilder: (context) {
@@ -362,7 +371,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
     );
   }
 
-  void showFleetDialog(Fleet? fleet) {
+  void showFleetDialog(Fleet? fleet,String companyId) {
     WoltModalSheet.show<void>(
       pageIndexNotifier: pageIndexNotifier,
       context: context,
@@ -370,7 +379,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
       pageListBuilder: (modalSheetContext) {
         final textTheme = Theme.of(context).textTheme;
         return [
-          newBusPage(modalSheetContext, textTheme, fleet),
+          newBusPage(modalSheetContext, textTheme, fleet,companyId),
         ];
       },
       modalTypeBuilder: (context) {
@@ -395,84 +404,174 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
 
   @override
   Widget build(BuildContext context) {
-    final companyStream = ref.watch(StreamCompanyProvider("505548"));
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+    final currentUserStream =
+        ref.read(StreamCurrentUserProvider(firebaseUser!.uid));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Inventories"),
-      ),
-      body: companyStream.when(
-        data: (company) {
-          return ListView(
+        title: Padding(
+          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
+          child: Row(
             children: [
-              ListTile(
-                title: const Text("Destinations"),
-                subtitle: const Text("Create and manage destination routes"),
-                trailing: FilledButton(
-                  onPressed: () => showRouteDialog(),
-                  child: const Text("New Route"),
+              InkWell(
+                onTap: () {
+                  context.pushReplacement('/');
+                },
+                child: const Text(
+                  "Dashboard",
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
-              company!.destinations.isNotEmpty
-                  ? ListView.separated(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: company.destinations.length,
-                      separatorBuilder: (BuildContext context, int index) =>
-                          const Divider(),
-                      itemBuilder: (context, index) => ListTile(
-                        leading: const CircleAvatar(
-                          child: Icon(Icons.location_on),
-                        ),
-                        title: Text(
-                          company.destinations[index].toString().toUpperCase(),
-                        ),
-                        onTap: () => showRouteDialog(
-                            destination: company.destinations[index]),
-                      ),
-                    )
-                  : const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text("No Destinations. Please add a New Route"),
-                      ),
-                    ),
-              const Divider(),
-              ListTile(
-                title: const Text("Bus Fleet"),
-                subtitle: const Text("Create and manage bus fleet"),
-                trailing: FilledButton(
-                  onPressed: () => showFleetDialog(null),
-                  child: const Text("New Bus"),
-                ),
-              ),
-              company.fleet.isNotEmpty
-                  ? ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: company.fleet.length,
-                      itemBuilder: (context, index) {
-                        var bus = company.fleet[index];
-                        return ListTile(
-                          leading: const CircleAvatar(
-                            child: Icon(Icons.directions_bus_sharp),
-                          ),
-                          title: Text(bus.licence.toUpperCase()),
-                          subtitle: Text(
-                              "${bus.model} (${bus.capacity}) Seater / ${bus.make}"),
-                          trailing: Text(" ${bus.year}"),
-                          onTap: () => showFleetDialog(bus),
-                        );
-                      },
-                    )
-                  : const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text("No Buses. Please add a New Bus"),
-                      ),
-                    ),
+              const Text(" / Inventories"),
             ],
-          );
+          ),
+        ),
+      ),
+      body: currentUserStream.when(
+        data: (user) {
+          return Consumer(builder: (context, ref, child) {
+            final companyStream =
+                ref.watch(StreamCompanyProvider(user!.companyIds.first));
+
+            return companyStream.when(
+              data: (company) {
+                return ListView(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+                  children: [
+                    ListTile(
+                      title: const Text("Destinations"),
+                      subtitle:
+                          const Text("Create and manage destination routes"),
+                      trailing: FilledButton(
+                        onPressed: () => showRouteDialog(company?.id),
+                        child: const Text("New Route"),
+                      ),
+                    ),
+                    company!.destinations.isNotEmpty
+                        ? ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: company.destinations.length,
+                            separatorBuilder:
+                                (BuildContext context, int index) =>
+                                    const Divider(),
+                            itemBuilder: (context, index) => ListTile(
+                              leading: const CircleAvatar(
+                                child: Icon(Icons.location_on),
+                              ),
+                              title: Text(
+                                company.destinations[index]
+                                    .toString()
+                                    .toUpperCase(),
+                              ),
+                              onTap: () => showRouteDialog(company.id,
+                                  destination: company.destinations[index]),
+                            ),
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 200,
+                              width: 200,
+                              color: Colors.grey.shade200,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: FilledButton(
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: Colors.green),
+                                        onPressed: () =>
+                                            showRouteDialog(company.id),
+                                        child: const Text("Add Route"),
+                                      ),
+                                    ),
+                                    const Text(
+                                      "No Destinations. Please add a New Route",
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                    const Divider(),
+                    ListTile(
+                      title: const Text("Bus Fleet"),
+                      subtitle: const Text("Create and manage bus fleet"),
+                      trailing: FilledButton(
+                        onPressed: () => showFleetDialog(null,company.id),
+                        child: const Text("New Bus"),
+                      ),
+                    ),
+                    company.fleet.isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: company.fleet.length,
+                            itemBuilder: (context, index) {
+                              var bus = company.fleet[index];
+                              return ListTile(
+                                leading: const CircleAvatar(
+                                  child: Icon(Icons.directions_bus_sharp),
+                                ),
+                                title: Text(bus.licence.toUpperCase()),
+                                subtitle: Text(
+                                    "${bus.model} (${bus.capacity}) Seater / ${bus.make}"),
+                                trailing: Text(" ${bus.year}"),
+                                onTap: () => showFleetDialog(bus,company.id),
+                              );
+                            },
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              height: 200,
+                              width: 200,
+                              color: Colors.grey.shade200,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: FilledButton(
+                                        style: FilledButton.styleFrom(
+                                            backgroundColor: Colors.green),
+                                        onPressed: () => showFleetDialog(null,company.id),
+                                        child: const Text("Add Bus"),
+                                      ),
+                                    ),
+                                    const Text(
+                                      "No Buses. Please add a New Bus",
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                  ],
+                );
+              },
+              error: (error, strace) {
+                print(strace);
+                print(error);
+                return Center(
+                  child: Text(
+                    error.toString(),
+                  ),
+                );
+              },
+              loading: () => const Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          });
         },
         error: (error, strace) {
           print(strace);

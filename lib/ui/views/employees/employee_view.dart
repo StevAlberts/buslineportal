@@ -107,24 +107,24 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                       .toList(),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FormBuilderDateTimePicker(
-                  name: 'dob',
-                  decoration: const InputDecoration(
-                    labelText: 'Date of Birth',
-                    hintText: "Select gender",
-                    icon: Icon(Icons.calendar_month),
-                  ),
-                  initialDatePickerMode: DatePickerMode.year,
-                  inputType: InputType.date,
-                  initialEntryMode: DatePickerEntryMode.input,
-                  initialDate: DateTime(2000),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                  ]),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: FormBuilderDateTimePicker(
+              //     name: 'dob',
+              //     decoration: const InputDecoration(
+              //       labelText: 'Date of Birth',
+              //       hintText: "Select gender",
+              //       icon: Icon(Icons.calendar_month),
+              //     ),
+              //     initialDatePickerMode: DatePickerMode.year,
+              //     inputType: InputType.date,
+              //     initialEntryMode: DatePickerEntryMode.input,
+              //     initialDate: DateTime(2000),
+              //     validator: FormBuilderValidators.compose([
+              //       FormBuilderValidators.required(),
+              //     ]),
+              //   ),
+              // ),
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: FormBuilderTextField(
@@ -203,7 +203,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                           _formKey.currentState?.instantValue["gender"];
                       var phone = _formKey.currentState?.instantValue["phone"];
                       var role = _formKey.currentState?.instantValue["role"];
-                      var dob = _formKey.currentState?.instantValue["dob"];
+                      // var dob = _formKey.currentState?.instantValue["dob"];
                       // var nin = _formKey.currentState?.instantValue["nin"];
 
                       var employee0 = Employee(
@@ -212,7 +212,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         firstName: firstName,
                         lastName: lastName,
                         gender: gender,
-                        dob: dob,
+                        // dob: dob,
                         // nin: nin,
                         phone: phone,
                         role: role,
@@ -342,27 +342,27 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                       .toList(),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FormBuilderDateTimePicker(
-                  name: 'dob',
-                  initialValue: employee?.dob ?? DateTime.now(),
-                  decoration: const InputDecoration(
-                    labelText: 'Date of Birth',
-                    hintText: "Select gender",
-                    icon: Icon(Icons.calendar_month),
-                  ),
-                  initialDatePickerMode: DatePickerMode.year,
-                  inputType: InputType.date,
-                  initialEntryMode: DatePickerEntryMode.input,
-                  initialDate: DateTime(2000),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                  ]),
-                  onChanged: (value) =>
-                      dobNotifier.value = value!.toIso8601String(),
-                ),
-              ),
+              // Padding(
+              //   padding: const EdgeInsets.all(8.0),
+              //   child: FormBuilderDateTimePicker(
+              //     name: 'dob',
+              //     initialValue: employee?.dob ?? DateTime.now(),
+              //     decoration: const InputDecoration(
+              //       labelText: 'Date of Birth',
+              //       hintText: "Select gender",
+              //       icon: Icon(Icons.calendar_month),
+              //     ),
+              //     initialDatePickerMode: DatePickerMode.year,
+              //     inputType: InputType.date,
+              //     initialEntryMode: DatePickerEntryMode.input,
+              //     initialDate: DateTime(2000),
+              //     validator: FormBuilderValidators.compose([
+              //       FormBuilderValidators.required(),
+              //     ]),
+              //     onChanged: (value) =>
+              //         dobNotifier.value = value!.toIso8601String(),
+              //   ),
+              // ),
               // Padding(
               //   padding: const EdgeInsets.all(8.0),
               //   child: FormBuilderTextField(
@@ -459,9 +459,9 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         var role = roleNotifier.value.isNotEmpty
                             ? roleNotifier.value
                             : employee!.role;
-                        var dob = dobNotifier.value.isNotEmpty
-                            ? dobNotifier.value
-                            : employee!.dob.toIso8601String();
+                        // var dob = dobNotifier.value.isNotEmpty
+                        //     ? dobNotifier.value
+                        //     : employee!.dob.toIso8601String();
                         // var nin = ninNotifier.value.isNotEmpty
                         //     ? ninNotifier.value
                         //     : employee!.nin;
@@ -472,7 +472,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                           firstName: firstName,
                           lastName: lastName,
                           gender: gender,
-                          dob: DateTime.parse(dob),
+                          // dob: DateTime.parse(dob),
                           // nin: nin,
                           phone: phone,
                           role: role,
@@ -670,13 +670,13 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "COMPANY ID $compId".toUpperCase(),
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Text(
+            //     "COMPANY ID $compId".toUpperCase(),
+            //     style: Theme.of(context).textTheme.titleSmall,
+            //   ),
+            // ),
             const SizedBox(height: 10),
             ListTile(
               title: const Text("ID"),
@@ -702,13 +702,13 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                 child: Text(maskPhoneNumber(employee.phone.toUpperCase())),
               ),
             ),
-            ListTile(
-              title: const Text("DOB"),
-              trailing: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(dobDateFormat(employee.dob)),
-              ),
-            ),
+            // ListTile(
+            //   title: const Text("DOB"),
+            //   trailing: Padding(
+            //     padding: const EdgeInsets.all(8.0),
+            //     child: Text(dobDateFormat(employee.dob)),
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FilledButton.icon(
@@ -989,7 +989,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                           );
                   },
                   error: (error, stack) {
-                    debugPrint("$stack");
+                    debugPrint("$error");
                     return Center(child: Text("$error"));
                   },
                   loading: () => const Center(
@@ -1001,7 +1001,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
           });
         },
         error: (error, stack) {
-          debugPrint("$stack");
+          debugPrint("$error");
           return Center(child: Text("$error"));
         },
         loading: () => const Center(

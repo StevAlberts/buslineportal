@@ -98,14 +98,13 @@ class AuthView extends ConsumerWidget {
           error.state = errorMsg ?? "";
 
           if (errorMsg == null && user != null) {
-
             // update displayName
-             user.updateDisplayName("$firstName $lastName");
+            user.updateDisplayName("$firstName $lastName");
 
-             // send verification email
-             user.sendEmailVerification();
+            // send verification email
+            user.sendEmailVerification();
 
-          // store user to db
+            // store user to db
             authenticationService
                 .addUserRequest(user, firstName, lastName)
                 .then((value) async {
@@ -178,14 +177,19 @@ class AuthView extends ConsumerWidget {
           children: [
             Column(
               children: [
-                const CircleAvatar(
-                  radius: 50,
+                Image.asset(
+                  "busline-logo.png",
+                  height: 200,
+                  width: 200,
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     "Busline Portal",
-                    style: Theme.of(context).textTheme.headlineMedium,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(color: Colors.black),
                   ),
                 ),
               ],
@@ -193,7 +197,8 @@ class AuthView extends ConsumerWidget {
             FormBuilder(
               key: _formKey,
               child: Padding(
-                padding:  EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.15),
+                padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.15),
                 child: Column(
                   children: [
                     Visibility(
@@ -378,17 +383,15 @@ class AuthView extends ConsumerWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: Visibility(
                         visible: !register && !forgotPass,
-                        child: FilledButton(
-                          onPressed: handleLogin,
-                          child: Padding(
-                            padding: const EdgeInsets.all(10.0),
-                            child: isLoading
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : const Text('Login'),
-                          ),
-                        ),
+                        child: isLoading
+                            ? const CircularProgressIndicator()
+                            : FilledButton(
+                                onPressed: handleLogin,
+                                child: const Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text('Login'),
+                                ),
+                              ),
                       ),
                     ),
                     Visibility(

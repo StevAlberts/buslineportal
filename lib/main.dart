@@ -21,7 +21,7 @@ void main() async {
 
   // Both of the following lines are good for testing,
   // but can be removed for release builds
-  if (kDebugMode) {
+  if (!kDebugMode) {
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
     await auth.setPersistence(Persistence.LOCAL);
@@ -52,7 +52,10 @@ class MyApp extends ConsumerWidget {
         pageTransitionsTheme: const PageTransitionsTheme(builders: {
           TargetPlatform.android: ZoomPageTransitionsBuilder(),
         }),
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.light,
+        ),
       ),
       // routerConfig: appRouterConfig(firebaseUser),
       routerConfig: firebaseUser.when(

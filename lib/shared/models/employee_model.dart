@@ -6,7 +6,7 @@ class Employee {
   String firstName;
   String lastName;
   String gender;
-  DateTime dob;
+  DateTime? dob;
   String? nin;
   String phone;
   String role;
@@ -21,7 +21,7 @@ class Employee {
     required this.firstName,
     required this.lastName,
     required this.gender,
-    required this.dob,
+    this.dob,
     this.nin,
     required this.phone,
     required this.role,
@@ -36,7 +36,7 @@ class Employee {
     firstName: json["firstName"],
     lastName: json["lastName"],
     gender: json["gender"],
-    dob: json["dob"].toDate(),
+    dob: null,
     nin: null,
     role: json["role"],
     phone: json["phone"]??"",
@@ -51,7 +51,7 @@ class Employee {
     "firstName": firstName,
     "lastName": lastName,
     "gender": gender,
-    "dob": dob,
+    "dob": null,
     "nin": null,
     "role": role,
     "phone":phone,

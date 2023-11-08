@@ -5,9 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../network/services/authentication_service.dart';
 
 final firebaseUserProvider = StreamProvider<User?>(
-      (ref) => FirebaseAuth.instance.authStateChanges(),
+  (ref) => FirebaseAuth.instance.authStateChanges(),
 );
-
 
 final authProvider = StateNotifierProvider<Auth, User?>(
   (ref) => Auth(),
@@ -45,13 +44,48 @@ class Auth extends StateNotifier<User?> {
 
   Future<Map<String, dynamic>> signup(String email, String password) async {
     try {
-      final credentials = await _firebaseAuth
-          .createUserWithEmailAndPassword(
+      final credentials = await _firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       state = credentials.user;
+
+      return {
+        "user": state,
+        "error": null,
+      };
+    } on FirebaseAuthException catch (e) {
+      return {
+        "user": null,
+        "error": e.message,
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> signInPhone(String phone) async {
+    try {
+      final credentials = await _firebaseAuth.signInWithPhoneNumber(phone);
+
+      return {
+        "user": state,
+        "error": null,
+      };
+    } on FirebaseAuthException catch (e) {
+      return {
+        "user": null,
+        "error": e.message,
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyPhone(String phone) async {
+    try {
+      final credentials = await _firebaseAuth.verifyPhoneNumber(
+          verificationCompleted: (credentials) {},
+          verificationFailed: (failed) {},
+          codeSent: (code, number) {},
+          codeAutoRetrievalTimeout: (timeout) {});
 
       return {
         "user": state,

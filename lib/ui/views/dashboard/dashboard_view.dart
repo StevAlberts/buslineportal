@@ -81,36 +81,76 @@ class DashboardView extends ConsumerWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              ListTile(
-                leading: CircleAvatar(
-                  child: TextAvatar(
-                    text: '${user?.firstName} ${user?.lastName}'.toUpperCase(),
-                    shape: Shape.Circular,
-                    numberLetters: 2,
-                    upperCase: true,
+          child: Consumer(builder: (context, ref, child) {
+            final companyData =
+                ref.watch(StreamCompanyProvider(user!.companyIds.first));
+
+            return Column(
+              children: [
+                companyData.when(
+                  data: (company) {
+                    return Column(
+                      children: [
+                        TextAvatar(
+                          text: company?.name.toUpperCase(),
+                          shape: Shape.Circular,
+                          numberLetters: 2,
+                          upperCase: true,
+                          fontSize: 20,
+                          size: 100,
+                        ),
+                        ListTile(
+                          title: Center(child: Text("${company?.name.toUpperCase()}")),
+                          // subtitle: Center(child: Text("${company?.id.toUpperCase()}")),
+                          subtitle: Center(
+                            child: Card(
+                              color: roleCardColor(user.role!),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("Code: ${company?.id}".toUpperCase()),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  error: (error, stack) {
+                    debugPrint("$error");
+                    return Center(child: Text("$error"));
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                ),
+                ListTile(
+                  leading: CircleAvatar(
+                    child: TextAvatar(
+                      text: '${user.firstName} ${user.lastName}'.toUpperCase(),
+                      shape: Shape.Circular,
+                      numberLetters: 2,
+                      upperCase: true,
+                    ),
+                  ),
+                  title: Text("${user.firstName} ${user.lastName}"),
+                  subtitle: Text("${user.email}"),
+                  trailing: Card(
+                    color: roleCardColor(user!.role!),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(user.role!.toUpperCase()),
+                    ),
                   ),
                 ),
-                title: Text("${user?.firstName} ${user?.lastName}"),
-                subtitle: Text("${user?.email}"),
-                trailing: Card(
-                  color: roleCardColor(user!.role!),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(user.role!.toUpperCase()),
-                  ),
+                const Divider(),
+                FilledButton(
+                  style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                  onPressed: logoutDialog,
+                  child: const Text("Logout"),
                 ),
-              ),
-              const Divider(),
-              FilledButton(
-                style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                onPressed: logoutDialog,
-                child: const Text("Logout"),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
+                const SizedBox(height: 20),
+              ],
+            );
+          }),
         ),
       );
     }
@@ -229,7 +269,7 @@ class DashboardView extends ConsumerWidget {
               Consumer(
                 builder: (context, ref, child) {
                   // final companyData =
-                  //     ref.read(StreamCompanyProvider(user!.companyIds.first));
+                  //     ref.watch(StreamCompanyProvider(user!.companyIds.first));
 
                   final currentTripsStream = ref
                       .watch(StreamMovingTripsProvider(user?.companyIds.first));

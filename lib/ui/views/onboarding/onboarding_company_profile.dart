@@ -3,6 +3,7 @@ import 'package:buslineportal/network/services/database_services.dart';
 import 'package:buslineportal/shared/models/company_model.dart';
 import 'package:buslineportal/shared/models/user_model.dart';
 import 'package:buslineportal/shared/models/user_request_model.dart';
+import 'package:buslineportal/shared/utils/dynamic_padding.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
             // String userId = user["uid"];
 
             return Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding:  EdgeInsets.symmetric(horizontal: paddingWidth(context)),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -123,7 +124,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'company',
                                     decoration: const InputDecoration(
@@ -135,8 +136,9 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                     ]),
                                   ),
                                 ),
+                                const SizedBox(height: 8),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'address',
                                     decoration: const InputDecoration(
@@ -148,8 +150,10 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                     ]),
                                   ),
                                 ),
+                                const SizedBox(height: 8),
+
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'phone',
                                     decoration: const InputDecoration(
@@ -167,8 +171,10 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                     // onChanged: (value) => phoneNotifier.value = value!,
                                   ),
                                 ),
+                                const SizedBox(height: 8),
+
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'email',
                                     decoration: const InputDecoration(

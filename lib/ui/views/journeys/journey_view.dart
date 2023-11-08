@@ -680,7 +680,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                           );
                   },
                   error: (error, stack) {
-                    debugPrint("$stack");
+                    debugPrint("$error");
                     return Center(child: Text("$error"));
                   },
                   loading: () => const Center(
@@ -692,7 +692,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
           });
         },
         error: (error, stack) {
-          debugPrint("$stack");
+          debugPrint("$error");
           return Center(child: Text("$error"));
         },
         loading: () => const Center(

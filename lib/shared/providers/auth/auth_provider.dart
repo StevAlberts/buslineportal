@@ -63,22 +63,6 @@ class Auth extends StateNotifier<User?> {
     }
   }
 
-  Future<Map<String, dynamic>> signInPhone(String phone) async {
-    try {
-      final credentials = await _firebaseAuth.signInWithPhoneNumber(phone);
-
-      return {
-        "user": state,
-        "error": null,
-      };
-    } on FirebaseAuthException catch (e) {
-      return {
-        "user": null,
-        "error": e.message,
-      };
-    }
-  }
-
   Future<Map<String, dynamic>> verifyPhone(String phone) async {
     try {
       final credentials = await _firebaseAuth.verifyPhoneNumber(

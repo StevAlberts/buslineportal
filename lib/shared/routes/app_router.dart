@@ -43,10 +43,10 @@ appRouterConfig(User? firebaseUser) => GoRouter(
           path: '/create_profile',
           builder: (context, state) => CreateProfileView(),
         ),
-        GoRoute(
-          path: '/employees',
-          builder: (context, state) => const EmployeeView(),
-        ),
+        // GoRoute(
+        //   path: '/employees',
+        //   builder: (context, state) => const EmployeeView(company: null,),
+        // ),
         GoRoute(
           path: '/journeys',
           builder: (context, state) => const JourneyView(),
@@ -56,10 +56,10 @@ appRouterConfig(User? firebaseUser) => GoRouter(
         //   builder: (context, state) => const JourneyDetailsView(),
         // ),
         // GoRoute(
-        //   path: '/journey_details/:trip_id',
+        //   path: '/employees',
         //   builder: (context, state) {
-        //     final tripId = state.pathParameters['trip_id'];
-        //     final trips = state.extra as List<Trip>?;
+        //     final tripId = state.pathParameters['company'];
+        //     final trips = state.extra as Company;
         //     // Get the trip object from the list of trips.
         //     final trip = trips?.firstWhere((trip) => trip.id == tripId);
         //

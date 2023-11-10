@@ -21,6 +21,7 @@ class Company {
   List<Fleet> fleet;
   List destinations;
 
+  List requests;
   Company({
     required this.id,
     required this.ownerId,
@@ -31,20 +32,22 @@ class Company {
     required this.imgUrl,
     required this.fleet,
     required this.destinations,
+    required this.requests,
   });
 
   factory Company.fromJson(Map<String, dynamic>? json) => Company(
-      id: json?["id"] ?? "",
-      ownerId: json?["ownerId"] ?? "",
-      name: json?["name"] ?? "",
-      address: json?["address"] ?? "",
-      contact: json?["contact"] ?? "",
-      email: json?["email"] ?? "",
-      imgUrl: json?["imgURL"] ?? "",
-      // fleet: [],
-      fleet: List<Fleet>.from(
-          (json?["fleet"] ?? <Fleet>[]).map((x) => Fleet.fromJson(x))),
-      destinations: json?["destinations"] ?? <String>[]);
+        id: json?["id"] ?? "",
+        ownerId: json?["ownerId"] ?? "",
+        name: json?["name"] ?? "",
+        address: json?["address"] ?? "",
+        contact: json?["contact"] ?? "",
+        email: json?["email"] ?? "",
+        imgUrl: json?["imgURL"] ?? "",
+        fleet: List<Fleet>.from(
+            (json?["fleet"] ?? <Fleet>[]).map((x) => Fleet.fromJson(x))),
+        destinations: json?["destinations"] ?? <String>[],
+        requests: json?["requests"] ?? <String>[],
+      );
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -55,6 +58,7 @@ class Company {
         "email": email,
         "imgURL": imgUrl,
         "destinations": destinations,
+        "requests": requests,
         "fleet": fleet,
       };
 }

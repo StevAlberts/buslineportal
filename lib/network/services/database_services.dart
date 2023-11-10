@@ -1,5 +1,6 @@
 import 'package:buslineportal/shared/models/company_model.dart';
 import 'package:buslineportal/shared/models/employee_model.dart';
+import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:buslineportal/shared/models/trip_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,7 +12,8 @@ class DatabaseService {
   final requestsCollection = FirebaseFirestore.instance.collection('requests');
   final employeeCollection = FirebaseFirestore.instance.collection('employees');
   final tripsCollection = FirebaseFirestore.instance.collection('trips');
-  final companiesCollection = FirebaseFirestore.instance.collection('companies');
+  final companiesCollection =
+      FirebaseFirestore.instance.collection('companies');
   final passengerTicketsCollection =
       FirebaseFirestore.instance.collection('passengerTickets');
   final luggageTicketsCollection =
@@ -31,6 +33,28 @@ class DatabaseService {
     await employeeRef.update(employee.toJson());
   }
 
+  Future<void> acceptEmployeeRequest(
+    String employeeId,
+    String deviceId,
+    String deviceName,
+  ) async {
+    final employeeRef = employeeCollection.doc(employeeId);
+    await employeeRef.update({
+      "deviceId": deviceId,
+      "deviceName": deviceName,
+    });
+  }
+
+  Future<void> removeEmployeeRequest(String companyId, Map data) async {
+    final employeeRef = companiesCollection.doc(companyId);
+
+    await employeeRef.update(
+      {
+        "requests": FieldValue.arrayRemove([data])
+      },
+    );
+  }
+
   // create employee
   Future<void> deleteEmployee(String employeeId) async {
     final firestore = FirebaseFirestore.instance;
@@ -43,6 +67,17 @@ class DatabaseService {
     final firestore = FirebaseFirestore.instance;
     final tripRef = firestore.collection('trips').doc(trip.id);
     await tripRef.set(trip.toJson());
+  }
+
+  Future<void> createStaffTrips(List<StaffDetail> staffs,String tripId) async {
+    final firestore = FirebaseFirestore.instance;
+    for (var staff in staffs){
+      await firestore.collection('employees').doc(staff.staffId).update(
+        {
+          "jobs":FieldValue.arrayUnion([tripId])
+        }
+      );
+    }
   }
 
   // create trip

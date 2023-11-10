@@ -170,6 +170,14 @@ class AuthView extends ConsumerWidget {
     }
 
     return Scaffold(
+      bottomNavigationBar: const SafeArea(
+        child: ListTile(
+          dense: true,
+          title: Text("Powered by Busline"),
+          subtitle: Text("Terms and conditions apply"),
+          trailing: Text("Version 0.1.1"),
+        ),
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
         child: Column(

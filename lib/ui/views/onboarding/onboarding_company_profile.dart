@@ -44,13 +44,15 @@ class OnboardCompanyProfile extends ConsumerWidget {
             // String userId = user["uid"];
 
             return Padding(
-              padding:  EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+              padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
               child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const CircleAvatar(
-                      radius: 50,
+                    Image.asset(
+                      "busline-logo.png",
+                      height: 200,
+                      width: 200,
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -64,7 +66,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
                     ),
                     const SizedBox(height: 20),
                     Visibility(
-                      visible: !userData.isGranted! ,
+                      visible: !userData.isGranted!,
                       child: Column(
                         children: [
                           Padding(
@@ -100,7 +102,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
                       ),
                     ),
                     Visibility(
-                      visible: userData.isGranted ?? false ,
+                      visible: userData.isGranted ?? false,
                       child: Column(
                         children: [
                           Padding(
@@ -124,7 +126,8 @@ class OnboardCompanyProfile extends ConsumerWidget {
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'company',
                                     decoration: const InputDecoration(
@@ -138,7 +141,8 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                 ),
                                 const SizedBox(height: 8),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'address',
                                     decoration: const InputDecoration(
@@ -151,9 +155,9 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'phone',
                                     decoration: const InputDecoration(
@@ -172,9 +176,9 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40.0),
                                   child: FormBuilderTextField(
                                     name: 'email',
                                     decoration: const InputDecoration(
@@ -238,6 +242,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                           imgUrl: "",
                                           fleet: [],
                                           destinations: [],
+                                          requests: [],
                                         );
 
                                         // save details

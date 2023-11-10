@@ -146,7 +146,9 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.min(1),
                     FormBuilderValidators.required(
-                        errorText: "Please + add NEW ROUTES from Inventories*"),
+                        errorText: destinations.isNotEmpty
+                            ? "Please add start destination"
+                            : "Please + add NEW ROUTES from Inventories*"),
                   ]),
                   onChanged: (value) => startDestNotifier.value = value!,
                   items: destinations
@@ -173,7 +175,9 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.min(1),
                     FormBuilderValidators.required(
-                        errorText: "Please + add NEW ROUTES from Inventories*"),
+                        errorText: destinations.isNotEmpty
+                            ? "Please add start destination"
+                            : "Please + add NEW ROUTES from Inventories*"),
                   ]),
                   onChanged: (value) => endDestNotifier.value = value!,
                   items: destinations
@@ -396,6 +400,8 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                       if (trip == null) {
                         // save trip
                         databaseService.createTrip(trip0);
+                        // save trip for staff
+                        databaseService.createStaffTrips(staffDetails, tripId);
                       } else {
                         // update trip
                         databaseService.updateTrip(trip0);

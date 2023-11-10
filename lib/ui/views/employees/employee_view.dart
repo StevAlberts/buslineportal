@@ -12,6 +12,7 @@ import 'package:otp/otp.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
+import '../../../shared/models/company_model.dart';
 import '../../../shared/providers/users/user_provider.dart';
 import '../../../shared/utils/date_format_utils.dart';
 import '../../../shared/utils/dynamic_padding.dart';
@@ -19,7 +20,12 @@ import '../../../shared/utils/mask_phone_utils.dart';
 import '../../../shared/utils/app_color_utils.dart';
 
 class EmployeeView extends ConsumerStatefulWidget {
-  const EmployeeView({Key? key}) : super(key: key);
+  const EmployeeView({
+    Key? key,
+    required this.company,
+  }) : super(key: key);
+
+  final Company company;
 
   @override
   ConsumerState<EmployeeView> createState() => _EmployeeViewState();
@@ -212,6 +218,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         firstName: firstName,
                         lastName: lastName,
                         gender: gender,
+                        companyName: widget.company.name,
                         // dob: dob,
                         // nin: nin,
                         phone: phone,
@@ -469,6 +476,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         var employee0 = Employee(
                           id: employee!.id,
                           companyId: employee.companyId,
+                          companyName: employee.companyName,
                           firstName: firstName,
                           lastName: lastName,
                           gender: gender,
@@ -699,7 +707,19 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               title: const Text("CONTACT"),
               trailing: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(maskPhoneNumber(employee.phone.toUpperCase())),
+                child: Text(
+                  maskPhoneNumber(employee.phone.replaceFirst("256", "0")),
+                ),
+              ),
+            ),
+            Visibility(
+              visible: employee.deviceName != null,
+              child: ListTile(
+                title: const Text("DEVICE"),
+                trailing: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text("${employee.deviceName?.toUpperCase()}"),
+                ),
               ),
             ),
             // ListTile(

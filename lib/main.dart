@@ -5,8 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'firebase_options.dart';
 import 'shared/providers/auth/auth_provider.dart';
 
@@ -24,10 +23,12 @@ void main() async {
   if (!kDebugMode) {
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    await auth.setPersistence(Persistence.LOCAL);
+    await auth.setPersistence(Persistence.SESSION);
     // FirebaseAuth.instance.signOut();
   }
 
+  // use path for web
+  usePathUrlStrategy();
   runApp(
     const ProviderScope(child: MyApp()),
   );

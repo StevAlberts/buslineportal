@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Employee {
   String id;
+
   String companyId;
+  String companyName;
   String firstName;
   String lastName;
   String gender;
@@ -11,6 +13,8 @@ class Employee {
   String phone;
   String role;
   bool isOnline;
+  String? deviceId;
+  String? deviceName;
   List jobs;
 
   Timestamp? timestamp;
@@ -18,6 +22,7 @@ class Employee {
   Employee({
     required this.id,
     required this.companyId,
+    required this.companyName,
     required this.firstName,
     required this.lastName,
     required this.gender,
@@ -27,36 +32,44 @@ class Employee {
     required this.role,
     required this.isOnline,
     required this.jobs,
+    this.deviceId,
+    this.deviceName,
     this.timestamp,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) => Employee(
-    id: json["id"],
-    companyId: json["companyId"],
-    firstName: json["firstName"],
-    lastName: json["lastName"],
-    gender: json["gender"],
-    dob: null,
-    nin: null,
-    role: json["role"],
-    phone: json["phone"]??"",
-    isOnline: json["isOnline"]??false,
-    jobs: json["jobs"]??[],
-    timestamp:  json["timestamp"],
-  );
+        id: json["id"],
+        companyId: json["companyId"],
+        companyName: json["companyName"] ?? "",
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        gender: json["gender"],
+        dob: null,
+        nin: null,
+        role: json["role"],
+        phone: json["phone"] ?? "",
+        isOnline: json["isOnline"] ?? false,
+        deviceId: json["deviceId"],
+        deviceName: json["deviceName"],
+        jobs: json["jobs"] ?? [],
+        timestamp: json["timestamp"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "companyId": companyId,
-    "firstName": firstName,
-    "lastName": lastName,
-    "gender": gender,
-    "dob": null,
-    "nin": null,
-    "role": role,
-    "phone":phone,
-    "isOnline": isOnline,
-    "jobs": jobs,
-    "timestamp":Timestamp.now(),
-  };
+        "id": id,
+        "companyId": companyId,
+        "companyName": companyName,
+        "firstName": firstName,
+        "lastName": lastName,
+        "gender": gender,
+        "dob": null,
+        "nin": null,
+        "role": role,
+        "phone": phone.replaceFirst(r"0", "256"),
+        "isOnline": isOnline,
+        "deviceId": deviceId,
+        "deviceName": deviceName,
+        "jobs": jobs,
+        "timestamp": Timestamp.now(),
+      };
 }

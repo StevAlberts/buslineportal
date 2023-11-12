@@ -304,24 +304,44 @@ class DashboardView extends ConsumerWidget {
                               return ListTile(
                                 title: Text("$names ($phone) $id"),
                                 subtitle: Text("$deviceName"),
-                                trailing: TextButton(
-                                  onPressed: () {
-                                    databaseService
-                                        .acceptEmployeeRequest(
-                                            id, deviceId, deviceName)
-                                        .then((value) {
-                                      // clean requests
-                                      databaseService.removeEmployeeRequest(
-                                          companyId, request);
-                                    });
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    TextButton(
+                                      style:TextButton.styleFrom(foregroundColor: Colors.grey),
+                                      onPressed: () {
+                                        // clean requests
+                                        databaseService.removeEmployeeRequest(
+                                            companyId, request);
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text("Request Accepted"),
-                                      ),
-                                    );
-                                  },
-                                  child: const Text("ACCEPT"),
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text("Request rejected."),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text("REJECT"),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        databaseService
+                                            .acceptEmployeeRequest(
+                                                id, deviceId, deviceName)
+                                            .then((value) {
+                                          // clean requests
+                                          databaseService.removeEmployeeRequest(
+                                              companyId, request);
+                                        });
+
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text("Request Accepted"),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text("ACCEPT"),
+                                    ),
+                                  ],
                                 ),
                               );
                             },

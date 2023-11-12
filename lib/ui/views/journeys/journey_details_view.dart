@@ -2,6 +2,8 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:buslineportal/shared/utils/app_color_utils.dart';
 import 'package:buslineportal/shared/utils/app_strings_utils.dart';
 import 'package:buslineportal/shared/utils/date_format_utils.dart';
+import 'package:buslineportal/ui/views/tickets/luggage_tickets_view.dart';
+import 'package:buslineportal/ui/views/tickets/passenger_tickets_view.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -188,7 +190,11 @@ class JourneyDetailsView extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
-                          context.go("/passengers");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      PassengerTicketsView(tripId: trip!.id)));
                         },
                       ),
                       ListTile(
@@ -206,7 +212,11 @@ class JourneyDetailsView extends StatelessWidget {
                         ),
                         trailing: const Icon(Icons.arrow_forward_ios),
                         onTap: () {
-                          context.go("/luggage");
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      LuggageTicketsView(tripId: trip!.id)));
                         },
                       ),
                       ListTile(
@@ -227,7 +237,9 @@ class JourneyDetailsView extends StatelessWidget {
                                 backgroundColor: Colors.green),
                             icon: const Icon(Icons.print),
                             onPressed: () {
-                              context.go("/report");
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Coming soon...")),
+                              );
                             },
                             label: const Text("Generate"),
                           ),

@@ -186,7 +186,7 @@ class AuthView extends ConsumerWidget {
             Column(
               children: [
                 Image.asset(
-                  "busline-logo.png",
+                  "assets/busline-logo.png",
                   height: 200,
                   width: 200,
                 ),

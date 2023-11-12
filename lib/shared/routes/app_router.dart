@@ -71,17 +71,13 @@ appRouterConfig(User? firebaseUser) => GoRouter(
           path: '/inventories',
           builder: (context, state) => const InventoriesView(),
         ),
-        GoRoute(
-          path: '/passengers',
-          builder: (context, state) => const PassengerTicketsView(),
-        ),
+        // GoRoute(
+        //   path: '/passengers',
+        //   builder: (context, state) => const PassengerTicketsView(),
+        // ),
         GoRoute(
           path: '/passenger_details',
           builder: (context, state) => const PassengerTicketDetailsView(),
-        ),
-        GoRoute(
-          path: '/luggage',
-          builder: (context, state) => const LuggageTicketsView(),
         ),
         GoRoute(
           path: '/luggage_details',

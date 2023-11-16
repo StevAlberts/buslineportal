@@ -12,6 +12,7 @@ String luggageToJson(LuggageTicket data) => json.encode(data.toJson());
 class LuggageTicket {
   String id;
   String tripId;
+  String staffId;
   String senderNames;
   String senderContact;
   String toDest;
@@ -30,6 +31,7 @@ class LuggageTicket {
   LuggageTicket({
     required this.id,
     required this.tripId,
+    required this.staffId,
     required this.senderNames,
     required this.senderContact,
     required this.toDest,
@@ -49,6 +51,7 @@ class LuggageTicket {
   factory LuggageTicket.fromJson(Map<String, dynamic> json) => LuggageTicket(
     id: json["id"],
     tripId: json["tripId"],
+    staffId: json["staffId"],
     senderContact: json["senderContact"],
     senderNames: json["senderNames"],
     toDest: json["toDest"],
@@ -68,6 +71,7 @@ class LuggageTicket {
   Map<String, dynamic> toJson() => {
     "id": id,
     "tripId": tripId,
+    "staffId": staffId,
     "senderContact": senderContact,
     "senderNames": senderNames,
     "toDest": toDest,

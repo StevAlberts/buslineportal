@@ -180,9 +180,10 @@ class AuthView extends ConsumerWidget {
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        child: ListView(
+          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            SizedBox(height: MediaQuery.sizeOf(context).height*0.1),
             Column(
               children: [
                 Image.asset(
@@ -217,14 +218,14 @@ class AuthView extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Forgot your password?",
+                              "Sorry, Forgot your password?",
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Enter your registration email and we will send you a password reset link.",
+                              "Enter your email address and we will send you a password reset link.",
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ),
@@ -238,7 +239,7 @@ class AuthView extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Get Started",
+                              "Welcome",
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ),
@@ -354,23 +355,20 @@ class AuthView extends ConsumerWidget {
                       visible: !register && !forgotPass,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              StateController<bool> load =
-                                  ref.read(resetPassProvider.notifier);
-                              load.state = true;
-                            },
-                            child: const Text("Forgot your password?"),
-                          ),
+                        child: TextButton(
+                          onPressed: () {
+                            StateController<bool> load =
+                                ref.read(resetPassProvider.notifier);
+                            load.state = true;
+                          },
+                          child: const Text("Forgot your password?"),
                         ),
                       ),
                     ),
                     Visibility(
                       visible: register || forgotPass,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text("Already have an account?"),
                           TextButton(

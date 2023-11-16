@@ -1,39 +1,74 @@
-class StaffDetail {
-  String? staffId;
-  String? role;
-  String? photoURL;
-  String? firstName;
-  String? lastName;
-  String? gender;
-  String? phone;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-  StaffDetail({
-    this.staffId,
-    this.role,
-    this.photoURL,
-    this.firstName,
-    this.lastName,
-    this.gender,
-    this.phone,
+class Staff {
+  String id;
+  String companyId;
+  String companyName;
+  String firstName;
+  String lastName;
+  String gender;
+  DateTime? dob;
+  String? nin;
+  String phone;
+  String role;
+  bool isOnline;
+  String? deviceId;
+  String? deviceName;
+  List trips;
+
+  Timestamp? timestamp;
+
+  Staff({
+    required this.id,
+    required this.companyId,
+    required this.companyName,
+    required this.firstName,
+    required this.lastName,
+    required this.gender,
+    this.dob,
+    this.nin,
+    required this.phone,
+    required this.role,
+    required this.isOnline,
+    required this.trips,
+    this.deviceId,
+    this.deviceName,
+    this.timestamp,
   });
 
-  factory StaffDetail.fromJson(Map<String, dynamic>? json) => StaffDetail(
-        staffId: json?["id"],
-        role: json?["role"],
-        photoURL: json?["photoURL"],
-        firstName: json?["firstName"],
-        lastName: json?["lastName"],
-        gender: json?["gender"],
-        phone: json?["phone"],
+  factory Staff.fromJson(Map<String, dynamic> json) => Staff(
+        id: json["id"],
+        companyId: json["companyId"],
+        companyName: json["companyName"] ?? "",
+        firstName: json["firstName"],
+        lastName: json["lastName"],
+        gender: json["gender"],
+        dob: null,
+        nin: null,
+        role: json["role"],
+        phone: json["phone"] ?? "",
+        isOnline: json["isOnline"] ?? false,
+        deviceId: json["deviceId"],
+        deviceName: json["deviceName"],
+        trips: json["trips"] ?? [],
+        timestamp: json["timestamp"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": staffId,
-        "role": role,
-        "photoURL": photoURL,
+        "id": id,
+        "companyId": companyId,
+        "companyName": companyName,
         "firstName": firstName,
         "lastName": lastName,
         "gender": gender,
-        "phone": phone,
+        "dob": null,
+        "nin": null,
+        "role": role,
+        "phone": phone.replaceFirst(r"0", "256"),
+        "isOnline": isOnline,
+        "deviceId": deviceId,
+        "deviceName": deviceName,
+        "trips": trips,
+        "timestamp": Timestamp.now(),
       };
 }

@@ -1,4 +1,4 @@
-import 'package:buslineportal/shared/models/employee_model.dart';
+import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -7,7 +7,7 @@ part 'employees_provider.g.dart';
 var employeesCollection = FirebaseFirestore.instance.collection('employees');
 
 @riverpod
-Stream<List<Employee>> streamCompanyEmployees(
+Stream<List<Staff>> streamCompanyEmployees(
     StreamCompanyEmployeesRef ref,
     String companyId,
     ) {
@@ -17,7 +17,7 @@ Stream<List<Employee>> streamCompanyEmployees(
       .orderBy('timestamp', descending: true)
       .snapshots()
       .map((snapshot) => snapshot.docs
-      .map((doc) => Employee.fromJson(doc.data()))
+      .map((doc) => Staff.fromJson(doc.data()))
       .toList());
 
   return employeeStream;

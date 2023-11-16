@@ -72,7 +72,7 @@ class JourneyDetailsView extends StatelessWidget {
                   trailing: Text(
                     journeyStatusText(
                       trip!.isStarted,
-                      trip?.departure == null,
+                      // trip?.departure == null,
                     ),
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -140,7 +140,7 @@ class JourneyDetailsView extends StatelessWidget {
                           child: Icon(Icons.alarm),
                         ),
                         title: Text(
-                          "Departure Time",
+                          "Start Time",
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         subtitle: Text(
@@ -158,7 +158,7 @@ class JourneyDetailsView extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         subtitle: Text(
-                          travelDateFormat(trip!.departure),
+                          trip?.arrival != null ?travelDateFormat(trip!.arrival):"---",
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),
@@ -245,24 +245,24 @@ class JourneyDetailsView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const Divider(),
-                      ListTile(
-                        title: Text(
-                          "Incidence Reports",
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 3,
-                        itemBuilder: (context, index) => const ListTile(
-                          leading: Text("23"),
-                          title: Text("Incidence details"),
-                          subtitle: Text("Destination"),
-                          trailing: Text("UGX 20,000"),
-                        ),
-                      ),
+                      // const Divider(),
+                      // ListTile(
+                      //   title: Text(
+                      //     "Incidence Reports",
+                      //     style: Theme.of(context).textTheme.titleLarge,
+                      //   ),
+                      // ),
+                      // ListView.builder(
+                      //   shrinkWrap: true,
+                      //   physics: const NeverScrollableScrollPhysics(),
+                      //   itemCount: 3,
+                      //   itemBuilder: (context, index) => const ListTile(
+                      //     leading: Text("23"),
+                      //     title: Text("Incidence details"),
+                      //     subtitle: Text("Destination"),
+                      //     trailing: Text("UGX 20,000"),
+                      //   ),
+                      // ),
                       const Divider(),
                     ],
                   ),

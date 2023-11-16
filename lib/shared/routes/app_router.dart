@@ -23,7 +23,7 @@ appRouterConfig(User? firebaseUser) => GoRouter(
         if (firebaseUser == null) {
           return '/login';
         } else {
-          return null;
+          return '/';
         }
       },
       routes: [
@@ -47,10 +47,10 @@ appRouterConfig(User? firebaseUser) => GoRouter(
         //   path: '/employees',
         //   builder: (context, state) => const EmployeeView(company: null,),
         // ),
-        GoRoute(
-          path: '/journeys',
-          builder: (context, state) => const JourneyView(),
-        ),
+        // GoRoute(
+        //   path: '/journeys',
+        //   builder: (context, state) => const JourneyView(),
+        // ),
         // GoRoute(
         //   path: '/journey_details',
         //   builder: (context, state) => const JourneyDetailsView(),

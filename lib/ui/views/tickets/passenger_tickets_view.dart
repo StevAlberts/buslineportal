@@ -1,3 +1,4 @@
+import 'package:buslineportal/shared/providers/tickets/tickets_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,6 +23,8 @@ class PassengerTicketsView extends ConsumerWidget {
         data: (tickets) {
           return tickets.isNotEmpty
               ? ListView.separated(
+            padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+
             itemCount: tickets.length,
             separatorBuilder: (context, index) => const Divider(
               thickness: 0.1,
@@ -55,7 +58,7 @@ class PassengerTicketsView extends ConsumerWidget {
                     //     : const SizedBox(),
                   ],
                 ),
-                subtitle: Text(passenger.toDest),
+                subtitle: Text("${passenger.fromDest.toUpperCase()} -to- ${passenger.toDest.toUpperCase()}"),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

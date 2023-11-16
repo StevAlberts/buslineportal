@@ -1,6 +1,6 @@
 import 'package:buslineportal/shared/models/company_model.dart';
-import 'package:buslineportal/shared/models/employee_model.dart';
 import 'package:buslineportal/shared/models/staff_model.dart';
+import 'package:buslineportal/shared/models/staff_details_model.dart';
 import 'package:buslineportal/shared/models/trip_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -20,14 +20,14 @@ class DatabaseService {
       FirebaseFirestore.instance.collection('luggageTickets');
 
   // create employee
-  Future<void> createEmployee(Employee employee) async {
+  Future<void> createEmployee(Staff employee) async {
     final firestore = FirebaseFirestore.instance;
     final employeeRef = employeeCollection.doc(employee.id);
     await employeeRef.set(employee.toJson());
   }
 
   // update employee
-  Future<void> updateEmployee(Employee employee) async {
+  Future<void> updateEmployee(Staff employee) async {
     final firestore = FirebaseFirestore.instance;
     final employeeRef = employeeCollection.doc(employee.id);
     await employeeRef.update(employee.toJson());
@@ -69,12 +69,16 @@ class DatabaseService {
     await tripRef.set(trip.toJson());
   }
 
-  Future<void> createStaffTrips(List<StaffDetail> staffs,String tripId) async {
+  Future<void> createStaffTrips(List<StaffDetail> staffs, String tripId) async {
     final firestore = FirebaseFirestore.instance;
     for (var staff in staffs){
+      var trip = {
+        "id":tripId,
+        "role":staff.role,
+      };
       await firestore.collection('employees').doc(staff.staffId).update(
         {
-          "jobs":FieldValue.arrayUnion([tripId])
+          "trips":FieldValue.arrayUnion([trip])
         }
       );
     }

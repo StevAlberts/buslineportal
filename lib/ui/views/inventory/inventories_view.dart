@@ -441,9 +441,9 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
                       EdgeInsets.symmetric(horizontal: paddingWidth(context)),
                   children: [
                     ListTile(
-                      title: const Text("Destinations"),
+                      title: const Text("Bus Routes"),
                       subtitle:
-                          const Text("Create and manage destination routes"),
+                          const Text("Create and manage destination bus routes"),
                       trailing: FilledButton(
                         onPressed: () => showRouteDialog(company?.id),
                         child: const Text("New Route"),

@@ -5,7 +5,7 @@
 import 'dart:convert';
 
 import 'package:buslineportal/shared/models/passenger_model.dart';
-import 'package:buslineportal/shared/models/staff_model.dart';
+import 'package:buslineportal/shared/models/staff_details_model.dart';
 
 import 'fleet_model.dart';
 
@@ -16,13 +16,14 @@ String tripToJson(Trip data) => json.encode(data.toJson());
 class Trip {
   String id;
   String companyId;
-  CompanyDetails? companyDetails;
+  CompanyDetails companyDetails;
   List<StaffDetail> staffDetails;
   List<Passenger> passengers;
   Fleet bus;
   String startDest;
   String endDest;
   bool isStarted;
+  bool isEnded;
   int fare;
   DateTime travelDate;
   DateTime? departure;
@@ -31,12 +32,13 @@ class Trip {
   Trip({
     required this.id,
     required this.companyId,
-    this.companyDetails,
+    required this.companyDetails,
     required this.bus,
     required this.staffDetails,
     required this.startDest,
     required this.endDest,
     required this.isStarted,
+    required this.isEnded,
     required this.fare,
     required this.passengers,
     required this.departure,
@@ -47,9 +49,7 @@ class Trip {
   factory Trip.fromJson(Map<String, dynamic> json) => Trip(
         id: json["id"],
         companyId: json["companyId"],
-        companyDetails: json["companyDetails"] != null
-            ? CompanyDetails.fromJson(json["companyDetails"])
-            : null,
+        companyDetails: CompanyDetails.fromJson(json["companyDetails"]),
         bus: Fleet.fromJson(json["bus"]),
         staffDetails: json["staff"] != null
             ? List<StaffDetail>.from(
@@ -63,9 +63,9 @@ class Trip {
         startDest: json["startDest"],
         endDest: json["endDest"],
         isStarted: json["isStarted"] ?? false,
-        departure:
-            json["departure"] != null ? json!["departure"].toDate() : null,
-        arrival: json["arrival"] != null ? json!["arrival"].toDate() : null,
+        isEnded: json["isEnded"] ?? false,
+        departure: json["departure"]?.toDate(),
+        arrival: json["arrival"]?.toDate(),
         travelDate: json["travelDate"].toDate(),
       );
 
@@ -80,6 +80,7 @@ class Trip {
         "startDest": startDest,
         "endDest": endDest,
         "isStarted": isStarted,
+        "isEnded": isEnded,
         "fare": fare,
         "departure": departure,
         "arrival": arrival,

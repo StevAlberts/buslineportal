@@ -42,6 +42,7 @@ dependencies:
   cached_network_image: ^3.3.0
   google_maps_flutter: ^2.5.0
   colorize_text_avatar: ^1.0.2
+  blurhash: ^1.1.1
 
   #Shared
   printing: ^5.11.0
@@ -52,6 +53,7 @@ dependencies:
   shared_preferences: ^2.2.2
   path_provider: ^2.1.1
   barcode: ^2.2.4
+  timeago: ^3.6.0
 
   #Network
   uuid: ^3.0.6

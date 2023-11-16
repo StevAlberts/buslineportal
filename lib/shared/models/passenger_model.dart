@@ -36,8 +36,8 @@ class Passenger {
     toDest: json["toDest"],
     fromDest: json["fromDest"],
     fare: json["fare"],
-    seatNo: json["ticketNo"],
-    travelDate: json["travelDate"],
+    seatNo: json["seatNo"],
+    travelDate: json["travelDate"].toDate(),
   );
 
   Map<String, dynamic> toJson() => {

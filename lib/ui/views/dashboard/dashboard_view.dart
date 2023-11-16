@@ -5,6 +5,8 @@ import 'package:buslineportal/shared/providers/trips/trips_provider.dart';
 import 'package:buslineportal/shared/providers/users/user_provider.dart';
 import 'package:buslineportal/shared/utils/dynamic_padding.dart';
 import 'package:buslineportal/ui/views/employees/employee_view.dart';
+import 'package:buslineportal/ui/views/inventory/inventories_view.dart';
+import 'package:buslineportal/ui/views/journeys/journey_view.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -107,7 +109,7 @@ class DashboardView extends ConsumerWidget {
                           color: roleCardColor(user!.role!),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text("Code: ${company?.id}".toUpperCase()),
+                            child: Text("Code: ${company?.id}"),
                           ),
                         ),
                       ),
@@ -256,6 +258,11 @@ class DashboardView extends ConsumerWidget {
                       trailing: FilledButton(
                         onPressed: () {
                           context.go('/journeys');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => JourneyView(company!)),
+                          );
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
@@ -269,7 +276,11 @@ class DashboardView extends ConsumerWidget {
                       subtitle: const Text("Manage bus fleet, routes and more"),
                       trailing: FilledButton(
                         onPressed: () {
-                          context.go("/inventories");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const InventoriesView()),
+                          );
                         },
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
@@ -308,13 +319,15 @@ class DashboardView extends ConsumerWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     TextButton(
-                                      style:TextButton.styleFrom(foregroundColor: Colors.grey),
+                                      style: TextButton.styleFrom(
+                                          foregroundColor: Colors.grey),
                                       onPressed: () {
                                         // clean requests
                                         databaseService.removeEmployeeRequest(
                                             companyId, request);
 
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
                                             content: Text("Request rejected."),
                                           ),
@@ -333,7 +346,8 @@ class DashboardView extends ConsumerWidget {
                                               companyId, request);
                                         });
 
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           const SnackBar(
                                             content: Text("Request Accepted"),
                                           ),
@@ -410,7 +424,7 @@ class DashboardView extends ConsumerWidget {
                                                   Text(
                                                     journeyStatusText(
                                                       trip.isStarted,
-                                                      trip.departure == null,
+                                                      // trip.departure == null,
                                                     ),
                                                     style: TextStyle(
                                                       color:
@@ -445,7 +459,8 @@ class DashboardView extends ConsumerWidget {
                                                   MaterialPageRoute(
                                                     builder: (context) =>
                                                         JourneyDetailsView(
-                                                            trip: trip),
+                                                      trip: trip,
+                                                    ),
                                                   ),
                                                 );
                                               },
@@ -474,7 +489,14 @@ class DashboardView extends ConsumerWidget {
                                                             backgroundColor:
                                                                 Colors.green),
                                                     onPressed: () {
-                                                      context.go('/journeys');
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              JourneyView(
+                                                                  company),
+                                                        ),
+                                                      );
                                                     },
                                                     child: const Text(
                                                         "Open Journeys"),
@@ -493,7 +515,9 @@ class DashboardView extends ConsumerWidget {
                                       );
                               },
                               error: (error, stack) {
-                                debugPrint("$error");
+                                print(error);
+                                print(stack);
+
                                 return Center(child: Text("$error"));
                               },
                               loading: () => const Center(
@@ -510,14 +534,18 @@ class DashboardView extends ConsumerWidget {
             );
           },
           error: (error, stack) {
-            debugPrint("$error");
+            print("$error");
+            print("$stack");
+
             return Center(child: Text("$error"));
           },
           loading: () => const Center(child: CircularProgressIndicator()),
         );
       }),
       error: (error, stack) {
-        debugPrint("$error");
+        print("$error");
+        print("$stack");
+
         return Scaffold(
           body: Center(child: Text("$error")),
         );

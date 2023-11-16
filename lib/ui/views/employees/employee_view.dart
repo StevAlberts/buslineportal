@@ -1,5 +1,5 @@
 import 'package:buslineportal/network/services/database_services.dart';
-import 'package:buslineportal/shared/models/employee_model.dart';
+import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:buslineportal/shared/providers/staff/employees_provider.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -212,7 +212,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                       // var dob = _formKey.currentState?.instantValue["dob"];
                       // var nin = _formKey.currentState?.instantValue["nin"];
 
-                      var employee0 = Employee(
+                      var employee0 = Staff(
                         id: employeeId,
                         companyId: "$companyId",
                         firstName: firstName,
@@ -224,7 +224,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         phone: phone,
                         role: role,
                         isOnline: false,
-                        jobs: [],
+                        trips: [],
                       );
 
                       // create employee to database
@@ -264,7 +264,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
   WoltModalSheetPage editStaffPage(
     BuildContext modalSheetContext,
     TextTheme textTheme,
-    Employee? employee,
+    Staff? employee,
   ) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
@@ -473,7 +473,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         //     ? ninNotifier.value
                         //     : employee!.nin;
 
-                        var employee0 = Employee(
+                        var employee0 = Staff(
                           id: employee!.id,
                           companyId: employee.companyId,
                           companyName: employee.companyName,
@@ -485,7 +485,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                           phone: phone,
                           role: role,
                           isOnline: employee.isOnline,
-                          jobs: employee.jobs,
+                          trips: employee.trips,
                         );
 
                         // update employee to database
@@ -528,7 +528,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
   WoltModalSheetPage confirmDeletePage(
     BuildContext modalSheetContext,
     TextTheme textTheme,
-    Employee employee,
+    Staff employee,
   ) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
@@ -637,7 +637,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
   WoltModalSheetPage staffDetailsPage(
     BuildContext modalSheetContext,
     TextTheme textTheme,
-    Employee employee,
+    Staff employee,
     String? compId,
   ) {
     return WoltModalSheetPage.withSingleChild(

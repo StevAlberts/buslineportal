@@ -16,15 +16,15 @@ void main() async {
   );
   final auth = FirebaseAuth.instance;
   // Disable persistence on web platforms. Must be called on initialization:
-  await auth.setPersistence(Persistence.NONE);
+  await auth.setPersistence(Persistence.SESSION);
 
   // Both of the following lines are good for testing,
   // but can be removed for release builds
   if (kDebugMode) {
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    await auth.setPersistence(Persistence.SESSION);
-    // FirebaseAuth.instance.signOut();
+  //   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    await auth.setPersistence(Persistence.LOCAL);
+  //   // FirebaseAuth.instance.signOut();
   }
 
   // use path for web

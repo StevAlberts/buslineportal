@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../shared/providers/auth/auth_provider.dart';
@@ -27,7 +26,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
 
     final userRepository = FirebaseFirestore.instance
         .collection('requests')
-        .doc(firebaseUser?.uid ?? "")
+        .doc(firebaseUser!.uid)
         .snapshots();
 
     return Scaffold(
@@ -71,13 +70,13 @@ class OnboardCompanyProfile extends ConsumerWidget {
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text("Hi, ${userData.firstName}",
+                            child: Text("Hi, ${firebaseUser.email}",
                                 style: Theme.of(context).textTheme.titleLarge),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              "Thank you for apply to Busline. We will get back to you as soon as possible.",
+                              "Welcome to Busline. We will get back to you as soon as possible.",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge
@@ -85,19 +84,19 @@ class OnboardCompanyProfile extends ConsumerWidget {
                               textAlign: TextAlign.center,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text("Already have an account?"),
-                                TextButton(
-                                  onPressed: () => authNotifier.logout(),
-                                  child: const Text("Login"),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Padding(
+                          //   padding: const EdgeInsets.all(8.0),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.center,
+                          //     children: [
+                          //       const Text("Already have an account?"),
+                          //       TextButton(
+                          //         onPressed: () => authNotifier.logout(),
+                          //         child: const Text("Login"),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

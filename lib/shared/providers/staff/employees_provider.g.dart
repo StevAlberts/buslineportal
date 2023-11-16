@@ -7,7 +7,7 @@ part of 'employees_provider.dart';
 // **************************************************************************
 
 String _$streamCompanyEmployeesHash() =>
-    r'3d5c93a3902e2240b321f39437bd8f4f7d16f283';
+    r'd5ab030b6c350a438b0af39fdace586c0da9995c';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -35,7 +35,7 @@ class _SystemHash {
 const streamCompanyEmployeesProvider = StreamCompanyEmployeesFamily();
 
 /// See also [streamCompanyEmployees].
-class StreamCompanyEmployeesFamily extends Family<AsyncValue<List<Employee>>> {
+class StreamCompanyEmployeesFamily extends Family<AsyncValue<List<Staff>>> {
   /// See also [streamCompanyEmployees].
   const StreamCompanyEmployeesFamily();
 
@@ -74,7 +74,7 @@ class StreamCompanyEmployeesFamily extends Family<AsyncValue<List<Employee>>> {
 
 /// See also [streamCompanyEmployees].
 class StreamCompanyEmployeesProvider
-    extends AutoDisposeStreamProvider<List<Employee>> {
+    extends AutoDisposeStreamProvider<List<Staff>> {
   /// See also [streamCompanyEmployees].
   StreamCompanyEmployeesProvider(
     String companyId,
@@ -109,7 +109,7 @@ class StreamCompanyEmployeesProvider
 
   @override
   Override overrideWith(
-    Stream<List<Employee>> Function(StreamCompanyEmployeesRef provider) create,
+    Stream<List<Staff>> Function(StreamCompanyEmployeesRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -126,7 +126,7 @@ class StreamCompanyEmployeesProvider
   }
 
   @override
-  AutoDisposeStreamProviderElement<List<Employee>> createElement() {
+  AutoDisposeStreamProviderElement<List<Staff>> createElement() {
     return _StreamCompanyEmployeesProviderElement(this);
   }
 
@@ -145,14 +145,13 @@ class StreamCompanyEmployeesProvider
   }
 }
 
-mixin StreamCompanyEmployeesRef
-    on AutoDisposeStreamProviderRef<List<Employee>> {
+mixin StreamCompanyEmployeesRef on AutoDisposeStreamProviderRef<List<Staff>> {
   /// The parameter `companyId` of this provider.
   String get companyId;
 }
 
 class _StreamCompanyEmployeesProviderElement
-    extends AutoDisposeStreamProviderElement<List<Employee>>
+    extends AutoDisposeStreamProviderElement<List<Staff>>
     with StreamCompanyEmployeesRef {
   _StreamCompanyEmployeesProviderElement(super.provider);
 

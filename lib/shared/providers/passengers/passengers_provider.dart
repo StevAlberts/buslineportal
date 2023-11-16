@@ -70,19 +70,19 @@ class SelectedSeats extends _$SelectedSeats {
   }
 }
 
-@riverpod
-Stream<List<PassengerTicket>> streamPassengerTickets(
-    StreamPassengerTicketsRef ref,
-    String tripId,
-    ) {
-  final collection = FirebaseFirestore.instance.collection('passengerTickets');
-
-  var ticketStream = collection
-      .where('tripId', isEqualTo: tripId).orderBy('seatNo', descending: false)
-      .snapshots()
-      .map((snapshot) => snapshot.docs
-      .map((doc) => PassengerTicket.fromJson(doc.data()))
-      .toList());
-
-  return ticketStream;
-}
+// @riverpod
+// Stream<List<PassengerTicket>> streamPassengerTickets(
+//     StreamPassengerTicketsRef ref,
+//     String tripId,
+//     ) {
+//   final collection = FirebaseFirestore.instance.collection('passengerTickets');
+//
+//   var ticketStream = collection
+//       .where('tripId', isEqualTo: tripId).orderBy('seatNo', descending: true)
+//       .snapshots()
+//       .map((snapshot) => snapshot.docs
+//       .map((doc) => PassengerTicket.fromJson(doc.data()))
+//       .toList());
+//
+//   return ticketStream;
+// }

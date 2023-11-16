@@ -1,13 +1,11 @@
-String journeyStatusText( bool isStarted, bool scheduled) {
+String journeyStatusText( bool isStarted) {
   String status;
-  if(scheduled){
-    status = "SCHEDULED";
-  }else{
+
     if (isStarted) {
       status = "STARTED";
     } else {
-      status = "ENDED";
+      status = "SCHEDULED";
     }
-  }
+
   return status;
 }

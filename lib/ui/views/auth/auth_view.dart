@@ -1,5 +1,4 @@
 import 'package:buslineportal/network/services/authentication_service.dart';
-import 'package:buslineportal/ui/views/app_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -180,285 +179,287 @@ class AuthView extends ConsumerWidget {
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
-        child: ListView(
-          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(height: MediaQuery.sizeOf(context).height*0.1),
-            Column(
-              children: [
-                Image.asset(
-                  "assets/busline-logo.png",
-                  height: 200,
-                  width: 200,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Busline Portal",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineMedium
-                        ?.copyWith(color: Colors.black),
+        child: Center(
+          child: ListView(
+            shrinkWrap: true,
+            // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Column(
+                children: [
+                  Image.asset(
+                    "assets/busline-logo.png",
+                    height: 200,
+                    width: 200,
                   ),
-                ),
-              ],
-            ),
-            FormBuilder(
-              key: _formKey,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.15),
-                child: Column(
-                  children: [
-                    Visibility(
-                      visible: forgotPass,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "Sorry, Forgot your password?",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "Enter your email address and we will send you a password reset link.",
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ),
-                        ],
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Busline Portal",
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(color: Colors.black),
                     ),
-                    Visibility(
-                      visible: register,
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "Welcome",
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "Create an account and we will send you a follow up email to get you started.",
-                              style: Theme.of(context).textTheme.bodyMedium,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      children: [
-                        Visibility(
-                          visible: register,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: FormBuilderTextField(
-                              name: 'first_name',
-                              decoration: const InputDecoration(
-                                labelText: 'First Name',
-                                icon: Icon(Icons.person),
-                              ),
-                              validator: FormBuilderValidators.compose([
-                                FormBuilderValidators.required(),
-                              ]),
-                            ),
-                          ),
-                        ),
-                        Visibility(
-                          visible: register,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: FormBuilderTextField(
-                              name: 'last_name',
-                              decoration: const InputDecoration(
-                                labelText: 'Last Name',
-                                icon: Icon(Icons.person),
-                              ),
-                              validator: FormBuilderValidators.compose([
-                                FormBuilderValidators.required(),
-                              ]),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FormBuilderTextField(
-                            name: 'email',
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              icon: Icon(Icons.alternate_email),
-                            ),
-                            validator: FormBuilderValidators.compose([
-                              FormBuilderValidators.required(),
-                              FormBuilderValidators.email(),
-                            ]),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Visibility(
-                          visible: !forgotPass,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: FormBuilderTextField(
-                              name: 'password',
-                              decoration: const InputDecoration(
-                                labelText: 'Password',
-                                icon: Icon(Icons.password),
-                              ),
-                              obscureText: true,
-                              validator: FormBuilderValidators.compose([
-                                FormBuilderValidators.required(),
-                                FormBuilderValidators.minLength(6),
-                              ]),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Visibility(
-                            visible: register,
-                            child: FormBuilderTextField(
-                              name: 'confirm_password',
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              decoration: const InputDecoration(
-                                labelText: 'Confirm Password',
-                                icon: Icon(Icons.password),
-                              ),
-                              obscureText: true,
-                              validator: (value) => _formKey.currentState
-                                          ?.fields['password']?.value !=
-                                      value
-                                  ? 'No coinciden'
-                                  : null,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Visibility(
-                      visible: errorMsg.isNotEmpty,
-                      child: Text(
-                        errorMsg,
-                        style: const TextStyle(color: Colors.red),
-                      ),
-                    ),
-                    Visibility(
-                      visible: !register && !forgotPass,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TextButton(
-                          onPressed: () {
-                            StateController<bool> load =
-                                ref.read(resetPassProvider.notifier);
-                            load.state = true;
-                          },
-                          child: const Text("Forgot your password?"),
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: register || forgotPass,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Already have an account?"),
-                          TextButton(
-                            onPressed: () {
-                              StateController<bool> load0 =
-                                  ref.read(contactUsProvider.notifier);
-                              load0.state = false;
-                              StateController<bool> load1 =
-                                  ref.read(resetPassProvider.notifier);
-                              load1.state = false;
-                            },
-                            child: const Text("Login"),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Visibility(
-                        visible: !register && !forgotPass,
-                        child: isLoading
-                            ? const CircularProgressIndicator()
-                            : FilledButton(
-                                onPressed: handleLogin,
-                                child: const Padding(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: Text('Login'),
-                                ),
-                              ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: forgotPass,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: FilledButton(
-                            onPressed: handleResetPassword,
-                            child: const Padding(
-                              padding: EdgeInsets.all(10.0),
-                              child: Text('Send'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: register,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Center(
-                          child: FilledButton(
-                            onPressed: registerAccount,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: isLoading
-                                  ? const CircularProgressIndicator(
-                                      color: Colors.white,
-                                    )
-                                  : const Text('Register'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Visibility(
-                        visible: !register && !forgotPass,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                ],
+              ),
+              FormBuilder(
+                key: _formKey,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.15),
+                  child: Column(
+                    children: [
+                      Visibility(
+                        visible: forgotPass,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("Need account?"),
-                            TextButton(
-                              onPressed: () {
-                                StateController<bool> load =
-                                    ref.read(contactUsProvider.notifier);
-                                load.state = true;
-                              },
-                              child: const Text("Contact Us"),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Sorry, Forgot your password?",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Enter your email address and we will send you a password reset link.",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                      Visibility(
+                        visible: register,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Welcome",
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "Create an account and we will send you a follow up email to get you started.",
+                                style: Theme.of(context).textTheme.bodyMedium,
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          Visibility(
+                            visible: register,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FormBuilderTextField(
+                                name: 'first_name',
+                                decoration: const InputDecoration(
+                                  labelText: 'First Name',
+                                  icon: Icon(Icons.person),
+                                ),
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
+                            ),
+                          ),
+                          Visibility(
+                            visible: register,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FormBuilderTextField(
+                                name: 'last_name',
+                                decoration: const InputDecoration(
+                                  labelText: 'Last Name',
+                                  icon: Icon(Icons.person),
+                                ),
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                ]),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FormBuilderTextField(
+                              name: 'email',
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                                icon: Icon(Icons.alternate_email),
+                              ),
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.email(),
+                              ]),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Visibility(
+                            visible: !forgotPass,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: FormBuilderTextField(
+                                name: 'password',
+                                decoration: const InputDecoration(
+                                  labelText: 'Password',
+                                  icon: Icon(Icons.password),
+                                ),
+                                obscureText: true,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                  FormBuilderValidators.minLength(6),
+                                ]),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Visibility(
+                              visible: register,
+                              child: FormBuilderTextField(
+                                name: 'confirm_password',
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                decoration: const InputDecoration(
+                                  labelText: 'Confirm Password',
+                                  icon: Icon(Icons.password),
+                                ),
+                                obscureText: true,
+                                validator: (value) => _formKey.currentState
+                                            ?.fields['password']?.value !=
+                                        value
+                                    ? 'No match'
+                                    : null,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Visibility(
+                        visible: errorMsg.isNotEmpty,
+                        child: Text(
+                          errorMsg,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      Visibility(
+                        visible: !register && !forgotPass,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextButton(
+                            onPressed: () {
+                              StateController<bool> load =
+                                  ref.read(resetPassProvider.notifier);
+                              load.state = true;
+                            },
+                            child: const Text("Forgot your password?"),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: register || forgotPass,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("Already have an account?"),
+                            TextButton(
+                              onPressed: () {
+                                StateController<bool> load0 =
+                                    ref.read(contactUsProvider.notifier);
+                                load0.state = false;
+                                StateController<bool> load1 =
+                                    ref.read(resetPassProvider.notifier);
+                                load1.state = false;
+                              },
+                              child: const Text("Login"),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Visibility(
+                          visible: !register && !forgotPass,
+                          child: isLoading
+                              ? const CircularProgressIndicator()
+                              : FilledButton(
+                                  onPressed: handleLogin,
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Text('Login'),
+                                  ),
+                                ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: forgotPass,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: FilledButton(
+                              onPressed: handleResetPassword,
+                              child: const Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Text('Send'),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: register,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: FilledButton(
+                              onPressed: registerAccount,
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: isLoading
+                                    ? const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                    : const Text('Register'),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Visibility(
+                          visible: !register && !forgotPass,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text("Need account?"),
+                              TextButton(
+                                onPressed: () {
+                                  StateController<bool> load =
+                                      ref.read(contactUsProvider.notifier);
+                                  load.state = true;
+                                },
+                                child: const Text("Contact Us"),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

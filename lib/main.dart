@@ -1,5 +1,4 @@
 import 'package:buslineportal/shared/routes/app_router.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -40,6 +39,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final firebaseUser = ref.watch(firebaseUserProvider);
 
+    // var firebaseUser = FirebaseAuth.instance.currentUser;
     return MaterialApp.router(
       title: 'Busline Portal',
       debugShowCheckedModeBanner: false,
@@ -61,7 +61,10 @@ class MyApp extends ConsumerWidget {
       // routerConfig: appRouterConfig(firebaseUser),
       routerConfig: firebaseUser.when(
         data: (user) => appRouterConfig(user),
-        error: (error, stack) => appRouterConfig(null),
+        error: (error, stack) {
+          print(error);
+          return appRouterConfig(null);
+        },
         loading: () => appRouterConfig(null),
       ),
     );

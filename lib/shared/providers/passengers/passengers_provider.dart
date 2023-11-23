@@ -1,10 +1,8 @@
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../models/passenger_model.dart';
-import '../../models/passenger_ticket_model.dart';
 
 part 'passengers_provider.g.dart';
 

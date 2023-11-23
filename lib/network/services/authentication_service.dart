@@ -12,7 +12,8 @@ class AuthenticationService {
 
   // register new user
 
-  Future<bool> addUserRequest(User user,String firstName, String lastName) async {
+  Future<bool> addUserRequest(
+      User user, String firstName, String lastName) async {
     try {
       // Set user data
       var data = {
@@ -23,7 +24,7 @@ class AuthenticationService {
         "emailVerified": user.emailVerified,
         "phoneNumber": user.phoneNumber,
         "photoURL": user.photoURL,
-        "timestamp":DateTime.now(),
+        "timestamp": DateTime.now(),
         "isGranted": false,
       };
 
@@ -46,6 +47,59 @@ class AuthenticationService {
       return false;
     }
   }
+
+  // Function to send sign-in email link
+  Future<void> sendInviteWithEmailLink(String id, String email) async {
+    final auth = FirebaseAuth.instance;
+
+    // Configure the action code settings.
+    ActionCodeSettings actionCodeSettings = ActionCodeSettings(
+      url: 'https://buslinego.web.app/invite/:id=$id',
+      handleCodeInApp: true,
+    );
+
+    /// TODO: Store the link
+    var emailLink = actionCodeSettings.url;
+
+    print(emailLink);
+
+    // Send the email link to the user.
+    return auth.sendSignInLinkToEmail(
+      email: email,
+      actionCodeSettings: actionCodeSettings,
+    );
+  }
+
+  Future<void> acceptInviteWithEmailLink(String email) async {
+    final auth = FirebaseAuth.instance;
+
+    // try {
+    //   final emailLink = await auth.currentUser.
+    //       .buildEmailLink(email: emailAddress, actionCodeSettings: actionCodeSettings);
+    //   // Use the generated emailLink for sending the email to the user
+    // } catch (error) {
+    //   // Handle any errors
+    // }
+    //
+    // Configure the action code settings.
+    ActionCodeSettings actionCodeSettings = ActionCodeSettings(
+      url: 'https://buslinego.web.app/invite?email=$email',
+      handleCodeInApp: true,
+    );
+
+    // Send the email link to the user.
+    return auth.sendSignInLinkToEmail(
+      email: email,
+      actionCodeSettings: actionCodeSettings,
+    );
+  }
+
+  Future<bool> logout() async {
+    await _firebaseAuth.signOut();
+    return true;
+  }
+
+
 }
 
 AuthenticationService authenticationService = AuthenticationService();

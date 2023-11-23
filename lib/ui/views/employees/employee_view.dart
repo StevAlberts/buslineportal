@@ -14,7 +14,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../../../shared/models/company_model.dart';
 import '../../../shared/providers/users/user_provider.dart';
-import '../../../shared/utils/date_format_utils.dart';
 import '../../../shared/utils/dynamic_padding.dart';
 import '../../../shared/utils/mask_phone_utils.dart';
 import '../../../shared/utils/app_color_utils.dart';
@@ -131,19 +130,20 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               //     ]),
               //   ),
               // ),
-              // Padding(
-              //   padding: const EdgeInsets.all(8.0),
-              //   child: FormBuilderTextField(
-              //     name: 'nin',
-              //     decoration: const InputDecoration(
-              //       labelText: 'NIN',
-              //       icon: Icon(Icons.branding_watermark),
-              //     ),
-              //     validator: FormBuilderValidators.compose([
-              //       FormBuilderValidators.required(),
-              //     ]),
-              //   ),
-              // ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: FormBuilderTextField(
+                  name: 'email',
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    helperText: 'optional*',
+                    icon: Icon(Icons.alternate_email),
+                  ),
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.email(),
+                  ]),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderTextField(
@@ -208,9 +208,8 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                       var gender =
                           _formKey.currentState?.instantValue["gender"];
                       var phone = _formKey.currentState?.instantValue["phone"];
+                      var email = _formKey.currentState?.instantValue["email"];
                       var role = _formKey.currentState?.instantValue["role"];
-                      // var dob = _formKey.currentState?.instantValue["dob"];
-                      // var nin = _formKey.currentState?.instantValue["nin"];
 
                       var employee0 = Staff(
                         id: employeeId,
@@ -219,8 +218,8 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                         lastName: lastName,
                         gender: gender,
                         companyName: widget.company.name,
-                        // dob: dob,
-                        // nin: nin,
+                        reservePass: phone,
+                        email: email,
                         phone: phone,
                         role: role,
                         isOnline: false,
@@ -483,6 +482,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
                           // dob: DateTime.parse(dob),
                           // nin: nin,
                           phone: phone,
+                          email: null,
                           role: role,
                           isOnline: employee.isOnline,
                           trips: employee.trips,
@@ -708,7 +708,7 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
               trailing: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
-                  maskPhoneNumber(employee.phone.replaceFirst("256", "0")),
+                  maskPhoneNumber(employee.phone!.replaceFirst("256", "0")),
                 ),
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/company_model.dart';
-import '../../models/trip_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'company_provider.g.dart';

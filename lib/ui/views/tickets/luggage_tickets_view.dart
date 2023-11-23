@@ -3,8 +3,10 @@ import 'package:buslineportal/shared/utils/date_format_utils.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
+import 'package:image/image.dart' as img;
+import 'package:octo_image/octo_image.dart';
 
-import '../../../shared/providers/passengers/passengers_provider.dart';
 import '../../../shared/providers/trips/trips_provider.dart';
 import '../../../shared/utils/dynamic_padding.dart';
 
@@ -60,7 +62,9 @@ class LuggageTicketsView extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(luggageTicket.receiverNames),
-                              const SizedBox(height: 8.0,),
+                              const SizedBox(
+                                height: 8.0,
+                              ),
                               Text(luggageTicket.receiverContact),
                             ],
                           ),
@@ -77,7 +81,9 @@ class LuggageTicketsView extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(luggageTicket.senderNames),
-                              const SizedBox(height: 8.0,),
+                              const SizedBox(
+                                height: 8.0,
+                              ),
                               Text(luggageTicket.senderContact),
                             ],
                           ),
@@ -98,10 +104,15 @@ class LuggageTicketsView extends ConsumerWidget {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('${luggageTicket.fare}', style: Theme.of(context).textTheme.bodyLarge,),
-                              SizedBox(height: 4),
-                              Text('Served By ${luggageTicket.staffId.toUpperCase()} on ${travelDateFormat(luggageTicket.timestamp)}',
-                              style: Theme.of(context).textTheme.bodyMedium,),
+                              Text(
+                                '${luggageTicket.fare}',
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Served By ${luggageTicket.staffId.toUpperCase()} on ${travelDateFormat(luggageTicket.timestamp)}',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
                             ],
                           ),
                         ),
@@ -113,17 +124,44 @@ class LuggageTicketsView extends ConsumerWidget {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: luggageTicket.imgUrls.length,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                           ),
                           itemBuilder: (context, index) => Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
-                              child: Image.network(luggageTicket.imgUrls[index]),
+                            child: Card(
+                              child: OctoImage(
+                                image: NetworkImage(
+                                  luggageTicket.imgUrls[index],
+                                ),
+                                placeholderBuilder:
+                                OctoPlaceholder.circularProgressIndicator(),
+                                errorBuilder: OctoError.icon(color: Colors.red),
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
+                              ),
+                              // child: OctoImage(
+                              //   image: CachedNetworkImageProvider(
+                              //       luggageTicket.imgUrls[index]),
+                              //   placeholderBuilder: OctoPlaceholder.circularProgressIndicator(),
+                              //   errorBuilder: OctoError.icon(color: Colors.red),
+                              //   fit: BoxFit.cover,
+                              // ),
+                              // child: Image.network(
+                              //   // luggageTicket.imgUrls[index],
+                              //   "https://firebasestorage.googleapis.com/v0/b/secrets-anon.appspot.com/o/secrets-media%2Fimg_5ov91voVLur9xywde6MTTq.jpg?alt=media&token=f47a9f90-7d89-4e6c-8257-79baa822c65c",
+                              //   height: 100,
+                              //   width: 100,
+                              // ),
+                              // child:img.Image(  height: 100,
+                              //     width: 100,
+                              //     image: ImageProvider("https://firebasestorage.googleapis.com/v0/b/buslinego.appspot.com/o/images%2Fkampala%2F280426%20(0).jpg?alt=media&token=81368280-9395-4613-97c4-7502c6cd27e3"),
+                              // ),
+
                             ),
                           ),
                         ),
-
                       ],
                     );
                     // return ListTile(

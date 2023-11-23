@@ -72,7 +72,7 @@ class Trip {
   Map<String, dynamic> toJson() => {
         "id": id,
         "companyId": companyId,
-        "companyDetails": companyDetails?.toJson(),
+        "companyDetails": companyDetails.toJson(),
         "bus": bus.toJson(),
         "staff": List<dynamic>.from(staffDetails.map((x) => x.toJson())),
         "passengers":

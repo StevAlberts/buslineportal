@@ -3,18 +3,15 @@ import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:buslineportal/shared/models/staff_details_model.dart';
 import 'package:buslineportal/shared/models/trip_model.dart';
 import 'package:buslineportal/shared/providers/trips/trips_provider.dart';
-import 'package:buslineportal/shared/utils/app_list_utils.dart';
 import 'package:buslineportal/shared/utils/app_strings_utils.dart';
 import 'package:buslineportal/shared/utils/date_format_utils.dart';
 import 'package:buslineportal/ui/views/journeys/journey_details_view.dart';
-import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
-import 'package:otp/otp.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
@@ -25,10 +22,9 @@ import '../../../shared/providers/staff/employees_provider.dart';
 import '../../../shared/providers/users/user_provider.dart';
 import '../../../shared/utils/dynamic_padding.dart';
 import '../../../shared/utils/app_color_utils.dart';
-import '../employees/employee_view.dart';
 
-final selectedEmployeesProvider = StateProvider((ref) => <Staff>{});
-final allStaffProvider = StateProvider((ref) => <Staff>{});
+// final selectedEmployeesProvider = StateProvider((ref) => <Staff>{});
+final allStaffProvider = StateProvider((ref) => <Staff>[]);
 
 class JourneyView extends ConsumerStatefulWidget {
   const JourneyView(this.company, {Key? key}) : super(key: key);
@@ -71,8 +67,8 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
     required List destinations,
   }) {
     // final selectedStaff = ref.read(selectedEmployeesProvider);
-    final allStaff = ref.read(allStaffProvider);
-    final selectedStaffs = ref.watch(allStaffProvider);
+    final allStaff = ref.watch(allStaffProvider);
+    // final selectedStaffs = ref.watch(allStaffProvider);
 
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
@@ -235,23 +231,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: FormBuilderSwitch(
-                  name: 'status',
-                  enabled: trip != null,
-                  initialValue: trip?.isStarted ?? false,
-                  decoration: const InputDecoration(
-                    labelText: 'Journey Status',
-                    hintText: "Change journey status",
-                  ),
-                  title: const Text("STARTED"),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                  ]),
-                  onChanged: (value) => statusNotifier.value = value!,
-                ),
-              ),
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderDateTimePicker(
@@ -382,11 +362,12 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
 
                 return employeesStream.when(
                   data: (employeeStream) {
-                    StateController<Set<Staff>> allStaff0 =
+                    StateController<List<Staff>> allStaff0 =
                         ref.read(allStaffProvider.notifier);
+
                     allStaff0.state.addAll(employeeStream);
 
-                    ref.read(allStaffProvider.notifier);
+                    // ref.read(allStaffProvider.notifier);
 
                     return Column(
                       children: [
@@ -681,12 +662,12 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                                       Text(
                                         journeyStatusText(
                                           trip.isStarted,
-                                          // trip.departure == null,
+                                          trip.isEnded,
                                         ),
                                         style: TextStyle(
                                           color: journeyStatusColors(
                                             trip.isStarted,
-                                            trip.departure == null,
+                                            trip.isEnded,
                                           ),
                                         ),
                                       ),
@@ -697,7 +678,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                                           size: 20,
                                           color: journeyStatusColors(
                                             trip.isStarted,
-                                            trip.departure == null,
+                                            trip.isEnded,
                                           ),
                                         ),
                                       )

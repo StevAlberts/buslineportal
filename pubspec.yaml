@@ -38,7 +38,7 @@ dependencies:
   flutter_form_builder: ^9.1.1
   form_builder_validators: ^9.1.0
   intl: ^0.18.1
-  image_picker: ^1.0.4
+  octo_image: ^2.0.0
   cached_network_image: ^3.3.0
   google_maps_flutter: ^2.5.0
   colorize_text_avatar: ^1.0.2
@@ -54,6 +54,7 @@ dependencies:
   path_provider: ^2.1.1
   barcode: ^2.2.4
   timeago: ^3.6.0
+  universal_html: ^2.2.4
 
   #Network
   uuid: ^3.0.6

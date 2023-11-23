@@ -14,8 +14,13 @@ class Staff {
   bool isOnline;
   String? deviceId;
   String? deviceName;
-  List trips;
+  String? sessionUid;
+  String? passcode;
+  String? reservePass;
+  String? currentTrip;
 
+  String? email;
+  List trips;
   Timestamp? timestamp;
 
   Staff({
@@ -33,7 +38,12 @@ class Staff {
     required this.trips,
     this.deviceId,
     this.deviceName,
+    this.sessionUid,
+    this.currentTrip,
+    this.passcode,
+    this.reservePass,
     this.timestamp,
+    required this.email,
   });
 
   factory Staff.fromJson(Map<String, dynamic> json) => Staff(
@@ -50,6 +60,11 @@ class Staff {
         isOnline: json["isOnline"] ?? false,
         deviceId: json["deviceId"],
         deviceName: json["deviceName"],
+        currentTrip: json["currentTrip"],
+        sessionUid: json["sessionUid"],
+        passcode: json["passcode"],
+        email: json["email"],
+        reservePass: json["reservePass"],
         trips: json["trips"] ?? [],
         timestamp: json["timestamp"],
       );
@@ -57,17 +72,21 @@ class Staff {
   Map<String, dynamic> toJson() => {
         "id": id,
         "companyId": companyId,
-        "companyName": companyName,
         "firstName": firstName,
         "lastName": lastName,
         "gender": gender,
         "dob": null,
         "nin": null,
         "role": role,
-        "phone": phone.replaceFirst(r"0", "256"),
+        "phone": phone,
         "isOnline": isOnline,
         "deviceId": deviceId,
+        "currentTrip": currentTrip,
+        "sessionUid": sessionUid,
+        "passcode": passcode,
         "deviceName": deviceName,
+        "reservePass": reservePass,
+        "email": email,
         "trips": trips,
         "timestamp": Timestamp.now(),
       };

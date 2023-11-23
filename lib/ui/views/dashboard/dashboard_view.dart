@@ -7,6 +7,8 @@ import 'package:buslineportal/shared/utils/dynamic_padding.dart';
 import 'package:buslineportal/ui/views/employees/employee_view.dart';
 import 'package:buslineportal/ui/views/inventory/inventories_view.dart';
 import 'package:buslineportal/ui/views/journeys/journey_view.dart';
+import 'package:buslineportal/ui/views/profile/profile_view.dart';
+import 'package:buslineportal/ui/views/reports/report_view.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,6 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 import '../../../shared/models/company_model.dart';
 import '../../../shared/models/trip_model.dart';
-import '../../../shared/models/user_request_model.dart';
 import '../../../shared/providers/auth/auth_provider.dart';
 import '../../../shared/utils/app_color_utils.dart';
 import '../../../shared/utils/app_strings_utils.dart';
@@ -28,44 +29,10 @@ class DashboardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authNotifier = ref.read(authProvider.notifier);
     final pageIndexNotifier = ValueNotifier(0);
 
     var firebaseUSer = FirebaseAuth.instance.currentUser;
     final streamUser = ref.watch(StreamCurrentUserProvider(firebaseUSer!.uid));
-
-    Future<void> logoutDialog() {
-      return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          // Return an AlertDialog widget
-          return AlertDialog(
-            icon: const Icon(
-              Icons.warning,
-              color: Colors.red,
-              size: 70,
-            ),
-            title: const Text('Do you want logout?'),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('CANCEL'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-              ),
-              TextButton(
-                style: TextButton.styleFrom(foregroundColor: Colors.red),
-                child: const Text('OK'),
-                onPressed: () {
-                  // Log user out
-                  authNotifier.logout();
-                },
-              ),
-            ],
-          );
-        },
-      );
-    }
 
     WoltModalSheetPage profileDialogPage(
       BuildContext modalSheetContext,
@@ -138,7 +105,7 @@ class DashboardView extends ConsumerWidget {
                 const Divider(),
                 FilledButton(
                   style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: logoutDialog,
+                  onPressed: () {},
                   child: const Text("Logout"),
                 ),
                 const SizedBox(height: 20),
@@ -168,39 +135,46 @@ class DashboardView extends ConsumerWidget {
                     padding: EdgeInsets.only(right: paddingBarWidth(context)),
                     child: InkWell(
                       onTap: () {
-                        WoltModalSheet.show<void>(
-                          pageIndexNotifier: pageIndexNotifier,
-                          context: context,
-                          barrierDismissible: false,
-                          pageListBuilder: (modalSheetContext) {
-                            final textTheme = Theme.of(context).textTheme;
-                            return [
-                              profileDialogPage(
-                                modalSheetContext,
-                                textTheme,
-                                user,
-                                company,
-                              ),
-                            ];
-                          },
-                          modalTypeBuilder: (context) {
-                            final size = MediaQuery.of(context).size.width;
-                            if (size < 400) {
-                              return WoltModalType.bottomSheet;
-                            } else {
-                              return WoltModalType.dialog;
-                            }
-                          },
-                          onModalDismissedWithBarrierTap: () {
-                            debugPrint('Closed modal sheet with barrier tap');
-                            Navigator.of(context).pop();
-                            pageIndexNotifier.value = 0;
-                          },
-                          maxDialogWidth: 560,
-                          minDialogWidth: 400,
-                          minPageHeight: 0.0,
-                          maxPageHeight: 0.9,
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ProfileView(company: company!, user: user),
+                          ),
                         );
+                        // WoltModalSheet.show<void>(
+                        //   pageIndexNotifier: pageIndexNotifier,
+                        //   context: context,
+                        //   barrierDismissible: false,
+                        //   pageListBuilder: (modalSheetContext) {
+                        //     final textTheme = Theme.of(context).textTheme;
+                        //     return [
+                        //       profileDialogPage(
+                        //         modalSheetContext,
+                        //         textTheme,
+                        //         user,
+                        //         company,
+                        //       ),
+                        //     ];
+                        //   },
+                        //   modalTypeBuilder: (context) {
+                        //     final size = MediaQuery.of(context).size.width;
+                        //     if (size < 400) {
+                        //       return WoltModalType.bottomSheet;
+                        //     } else {
+                        //       return WoltModalType.dialog;
+                        //     }
+                        //   },
+                        //   onModalDismissedWithBarrierTap: () {
+                        //     debugPrint('Closed modal sheet with barrier tap');
+                        //     Navigator.of(context).pop();
+                        //     pageIndexNotifier.value = 0;
+                        //   },
+                        //   maxDialogWidth: 560,
+                        //   minDialogWidth: 400,
+                        //   minPageHeight: 0.0,
+                        //   maxPageHeight: 0.9,
+                        // );
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -230,6 +204,32 @@ class DashboardView extends ConsumerWidget {
                 child: ListView(
                   padding: const EdgeInsets.all(8.0),
                   children: [
+                    FilledButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ReportView(),
+                          ),
+                        );
+                      },
+                      child: const Text("GO"),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilledButton(
+                        onPressed: () async {
+                          FirebaseAuth auth = FirebaseAuth.instance;
+
+// Wait for the user to complete the reCAPTCHA & for an SMS code to be sent.
+                          ConfirmationResult confirmationResult =
+                              await auth.signInWithPhoneNumber('+256705271731');
+
+                          print(confirmationResult.verificationId);
+                        },
+                        child: const Text("GO"),
+                      ),
+                    ),
                     ListTile(
                       leading: const Icon(Icons.group),
                       title: const Text("Employees"),
@@ -257,11 +257,12 @@ class DashboardView extends ConsumerWidget {
                       subtitle: const Text("Create trips and manage reports"),
                       trailing: FilledButton(
                         onPressed: () {
-                          context.go('/journeys');
+                          // context.go('/journeys');
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => JourneyView(company!)),
+                              builder: (context) => JourneyView(company!),
+                            ),
                           );
                         },
                         child: const Padding(
@@ -304,16 +305,18 @@ class DashboardView extends ConsumerWidget {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
+
                               var request = company.requests[index];
                               var names = request['name'];
                               var deviceName = request['deviceName'];
                               var deviceId = request['deviceId'];
-                              var phone = request['phone'];
+                              var phone =
+                                  request['phone'].replaceFirst("256", "0", 0);
                               var id = request['id'];
                               var companyId = request['companyId'];
 
                               return ListTile(
-                                title: Text("$names ($phone) $id"),
+                                title: Text("$names (ID $id)"),
                                 subtitle: Text("$deviceName"),
                                 trailing: Row(
                                   mainAxisSize: MainAxisSize.min,
@@ -324,12 +327,14 @@ class DashboardView extends ConsumerWidget {
                                       onPressed: () {
                                         // clean requests
                                         databaseService.removeEmployeeRequest(
-                                            companyId, request);
+                                          companyId,
+                                          request,
+                                        );
 
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
-                                            content: Text("Request rejected."),
+                                            content: Text("Request rejected"),
                                           ),
                                         );
                                       },
@@ -338,8 +343,8 @@ class DashboardView extends ConsumerWidget {
                                     TextButton(
                                       onPressed: () {
                                         databaseService
-                                            .acceptEmployeeRequest(
-                                                id, deviceId, deviceName)
+                                            .acceptEmployeeRequest(id, deviceId,
+                                                deviceName, context)
                                             .then((value) {
                                           // clean requests
                                           databaseService.removeEmployeeRequest(
@@ -349,7 +354,7 @@ class DashboardView extends ConsumerWidget {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(
                                           const SnackBar(
-                                            content: Text("Request Accepted"),
+                                            content: Text("Request accepted"),
                                           ),
                                         );
                                       },
@@ -424,13 +429,14 @@ class DashboardView extends ConsumerWidget {
                                                   Text(
                                                     journeyStatusText(
                                                       trip.isStarted,
+                                                      trip.isEnded,
                                                       // trip.departure == null,
                                                     ),
                                                     style: TextStyle(
                                                       color:
                                                           journeyStatusColors(
                                                         trip.isStarted,
-                                                        trip.departure == null,
+                                                        trip.isEnded,
                                                       ),
                                                     ),
                                                   ),
@@ -444,7 +450,7 @@ class DashboardView extends ConsumerWidget {
                                                       color:
                                                           journeyStatusColors(
                                                         trip.isStarted,
-                                                        trip.departure == null,
+                                                        trip.isEnded,
                                                       ),
                                                     ),
                                                   )

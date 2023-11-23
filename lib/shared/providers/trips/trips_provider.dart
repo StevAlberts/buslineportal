@@ -16,7 +16,7 @@ Stream<List<Trip>> streamAllTrips(
 ) {
   var ticketStream = tripCollection
       .where('companyId', isEqualTo: companyId)
-      .orderBy("isStarted", descending: true)
+      .orderBy("travelDate", descending: true)
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Trip.fromJson(doc.data())).toList());
@@ -41,10 +41,10 @@ Stream<List<Trip>> streamMovingTrips(
   StreamMovingTripsRef ref,
   String companyId,
 ) {
-
   var ticketStream = tripCollection
       .where('companyId', isEqualTo: companyId)
       .where("isStarted", isEqualTo: true)
+      .where("isEnded", isEqualTo: false)
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => Trip.fromJson(doc.data())).toList());

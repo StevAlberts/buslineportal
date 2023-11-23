@@ -1,4 +1,3 @@
-import 'package:barcode_widget/barcode_widget.dart';
 import 'package:buslineportal/shared/utils/app_color_utils.dart';
 import 'package:buslineportal/shared/utils/app_strings_utils.dart';
 import 'package:buslineportal/shared/utils/date_format_utils.dart';
@@ -6,8 +5,8 @@ import 'package:buslineportal/ui/views/tickets/luggage_tickets_view.dart';
 import 'package:buslineportal/ui/views/tickets/passenger_tickets_view.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pdf/widgets.dart' as pdf;
 
 import '../../../shared/models/trip_model.dart';
 import '../../../shared/utils/dynamic_padding.dart';
@@ -50,16 +49,46 @@ class JourneyDetailsView extends StatelessWidget {
           ? ListView(
               padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
               children: [
-                ListTile(
-                  leading: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.circle,
-                      color: journeyStatusColors(
-                        trip!.isStarted,
-                        trip?.departure == null,
-                      ),
+
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FormBuilderSwitch(
+                    name: 'status',
+                    // enabled: trip != null,
+                    enabled: false,
+                    initialValue: journeyStatusStarted(trip!.isStarted,
+                      trip!.isEnded),
+                    decoration: const InputDecoration(
+                      labelText: 'Journey Status',
+                      hintText: "Change journey status",
                     ),
+                    title: Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          color: journeyStatusColors(
+                            trip!.isStarted,
+                            trip!.isEnded,
+                          ),
+                        ),
+                        const SizedBox(width: 4.0),
+                        Text(
+                          journeyStatusText(
+                            trip!.isStarted,
+                            trip!.isEnded,
+                          ),
+                        ),
+                      ],
+                    ),
+                    onChanged: (value) {
+                      print(value);
+                    },
+                  ),
+                ),
+                ListTile(
+                  leading: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.directions_bus_filled_sharp),
                   ),
                   title: Text(
                     "Travel Date",
@@ -69,12 +98,12 @@ class JourneyDetailsView extends StatelessWidget {
                     travelDateFormat(trip!.travelDate),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  trailing: Text(
-                    journeyStatusText(
-                      trip!.isStarted,
-                      // trip?.departure == null,
+                  trailing: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "${trip?.bus.licence.toUpperCase()}",
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
-                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
                 const Divider(),
@@ -82,20 +111,6 @@ class JourneyDetailsView extends StatelessWidget {
                   title: Text(
                     "Trip Details",
                     style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                ),
-                ListTile(
-                  leading: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.directions_bus_filled_sharp),
-                  ),
-                  title: Text(
-                    "${trip?.bus.licence.toUpperCase()}",
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  subtitle: Text(
-                    "${trip?.bus.capacity} Seats",
-                    style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ),
                 Row(
@@ -118,6 +133,10 @@ class JourneyDetailsView extends StatelessWidget {
                     ),
                     Expanded(
                       child: ListTile(
+                        leading: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.location_off),
+                        ),
                         title: Text(
                           "To",
                           style: Theme.of(context).textTheme.bodySmall,
@@ -137,10 +156,10 @@ class JourneyDetailsView extends StatelessWidget {
                       ListTile(
                         leading: const Padding(
                           padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.alarm),
+                          child: Icon(Icons.play_circle),
                         ),
                         title: Text(
-                          "Start Time",
+                          "Start Activity",
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         subtitle: Text(
@@ -151,14 +170,16 @@ class JourneyDetailsView extends StatelessWidget {
                       ListTile(
                         leading: const Padding(
                           padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.timelapse),
+                          child: Icon(Icons.stop_circle),
                         ),
                         title: Text(
-                          "Arrival Time",
+                          "End Activity",
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         subtitle: Text(
-                          trip?.arrival != null ?travelDateFormat(trip!.arrival):"---",
+                          trip?.arrival != null
+                              ? travelDateFormat(trip!.arrival)
+                              : "---",
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ),

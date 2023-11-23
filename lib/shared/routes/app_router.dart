@@ -2,30 +2,34 @@
 import 'package:buslineportal/ui/app_index.dart';
 import 'package:buslineportal/ui/views/auth/auth_view.dart';
 import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
-import 'package:buslineportal/ui/views/employees/employee_view.dart';
 import 'package:buslineportal/ui/views/inventory/inventories_view.dart';
-import 'package:buslineportal/ui/views/journeys/journey_details_view.dart';
-import 'package:buslineportal/ui/views/journeys/journey_view.dart';
 import 'package:buslineportal/ui/views/tickets/luggage_ticket_details_view.dart';
-import 'package:buslineportal/ui/views/tickets/luggage_tickets_view.dart';
 import 'package:buslineportal/ui/views/tickets/passenger_ticket_details_view.dart';
-import 'package:buslineportal/ui/views/tickets/passenger_tickets_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../ui/views/onboarding/invite_view.dart';
 import '../../ui/views/profile/create_profile_view.dart';
-import '../models/trip_model.dart';
 
 appRouterConfig(User? firebaseUser) => GoRouter(
-      initialLocation: firebaseUser == null ? '/login' : '/',
-      redirect: (context, GoRouterState state) {
-        if (firebaseUser == null) {
-          return '/login';
-        } else {
-          return '/';
-        }
-      },
+      // log diagnostic info for your routes
+      debugLogDiagnostics: true,
+      initialLocation: '/',
+      // redirect: (context, GoRouterState state) {
+      //   // if (firebaseUser == null) {
+      //   //   return '/login';
+      //   // } else {
+      //   //   return null;
+      //   // }
+      //
+      //   // return firebaseUser != null ? null : '/login';
+      //
+      //   // if (firebaseUser != null) {
+      //   //   return null;
+      //   // } else {
+      //   //   return '/login';
+      //   // }
+      // },
       routes: [
         GoRoute(
           path: '/',
@@ -43,9 +47,13 @@ appRouterConfig(User? firebaseUser) => GoRouter(
           path: '/create_profile',
           builder: (context, state) => CreateProfileView(),
         ),
+        GoRoute(
+          path: '/invite/:id',
+          builder: (context, state) => InviteView(),
+        ),
         // GoRoute(
-        //   path: '/employees',
-        //   builder: (context, state) => const EmployeeView(company: null,),
+        //   path: '/users',
+        //   builder: (context, state) => const UsersScreen(filter: state.uri.queryParameters['filter']),
         // ),
         // GoRoute(
         //   path: '/journeys',

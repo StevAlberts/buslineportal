@@ -1,6 +1,5 @@
 import 'package:buslineportal/network/services/database_services.dart';
 import 'package:buslineportal/shared/providers/company/company_provider.dart';
-import 'package:buslineportal/shared/providers/trips/trips_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';

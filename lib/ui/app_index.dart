@@ -1,12 +1,10 @@
 import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
 import 'package:buslineportal/ui/views/onboarding/onboarding_company_profile.dart';
-import 'package:buslineportal/ui/views/profile/profile_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../shared/providers/auth/auth_provider.dart';
 import '../shared/providers/users/user_provider.dart';
 
 class AppIndex extends ConsumerWidget {

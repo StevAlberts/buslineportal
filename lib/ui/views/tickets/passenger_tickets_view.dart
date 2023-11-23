@@ -2,7 +2,6 @@ import 'package:buslineportal/shared/providers/tickets/tickets_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../shared/providers/passengers/passengers_provider.dart';
 import '../../../shared/utils/dynamic_padding.dart';
 
 class PassengerTicketsView extends ConsumerWidget {

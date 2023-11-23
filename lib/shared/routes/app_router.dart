@@ -15,21 +15,16 @@ appRouterConfig(User? firebaseUser) => GoRouter(
       // log diagnostic info for your routes
       debugLogDiagnostics: true,
       initialLocation: '/',
-      // redirect: (context, GoRouterState state) {
-      //   // if (firebaseUser == null) {
-      //   //   return '/login';
-      //   // } else {
-      //   //   return null;
-      //   // }
-      //
-      //   // return firebaseUser != null ? null : '/login';
-      //
-      //   // if (firebaseUser != null) {
-      //   //   return null;
-      //   // } else {
-      //   //   return '/login';
-      //   // }
-      // },
+      redirect: (context, GoRouterState state) {
+
+        // return firebaseUser != null ? null : '/login';
+
+        if (firebaseUser != null) {
+          return null;
+        } else {
+          return '/login';
+        }
+      },
       routes: [
         GoRoute(
           path: '/',

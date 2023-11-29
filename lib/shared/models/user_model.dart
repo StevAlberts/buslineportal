@@ -8,11 +8,11 @@ class UserModel {
   final String? phoneNumber;
   final String? photoURL;
   final String? role;
-  final List companyIds;
+  final String? companyId;
   final Timestamp? timestamp;
 
   UserModel({
-    required this.companyIds,
+    required this.companyId,
     this.uid,
     this.email,
     this.emailVerified,
@@ -37,7 +37,7 @@ class UserModel {
       photoURL: data?['photoURL'],
       timestamp: data?['timestamp'],
       role: data?['role'],
-      companyIds: data?['companyIds'] ?? [],
+      companyId: data?['companyId'],
     );
   }
 
@@ -50,7 +50,7 @@ class UserModel {
       "emailVerified": emailVerified,
       "phoneNumber": phoneNumber,
       "photoURL": photoURL,
-      "companyIds":companyIds,
+      "companyId":companyId,
       "role": role,
       "timestamp": DateTime.now(),
     };

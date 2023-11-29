@@ -12,20 +12,20 @@ Future<Uint8List> generateInvoice(
   final lorem = pw.LoremText();
 
   final products = <Product>[
-    Product('19874', lorem.sentence(4), 3.99, 2),
-    Product('98452', lorem.sentence(6), 15, 2),
-    Product('28375', lorem.sentence(4), 6.95, 3),
-    Product('95673', lorem.sentence(3), 49.99, 4),
-    Product('23763', lorem.sentence(2), 560.03, 1),
-    Product('55209', lorem.sentence(5), 26, 1),
-    Product('09853', lorem.sentence(5), 26, 1),
-    Product('23463', lorem.sentence(5), 34, 1),
-    Product('56783', lorem.sentence(5), 7, 4),
-    Product('78256', lorem.sentence(5), 23, 1),
-    Product('23745', lorem.sentence(5), 94, 1),
-    Product('07834', lorem.sentence(5), 12, 1),
-    Product('23547', lorem.sentence(5), 34, 1),
-    Product('98387', lorem.sentence(5), 7.99, 2),
+    Product('19874', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
+    Product('98452', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
+    Product('28375', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
+    Product('95673', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
+    Product('23763', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
+    Product('55209', lorem.sentence(3), 23, "Kampala", "Lira", 20000),
+    Product('09853', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
+    Product('23463', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
+    Product('56783', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
+    Product('78256', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
+    Product('23745', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
+    Product('07834', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
+    Product('23547', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
+    Product('98387', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
   ];
 
   final invoice = Invoice(
@@ -36,7 +36,7 @@ Future<Uint8List> generateInvoice(
     paymentInfo:
         '4509 Wiseman Street\nKnoxville, Tennessee(TN), 37929\n865-372-0425',
     tax: .15,
-    baseColor: PdfColors.teal,
+    baseColor: PdfColors.green,
     accentColor: PdfColors.blueGrey900,
   );
 
@@ -71,10 +71,10 @@ class Invoice {
 
   PdfColor get _accentTextColor => baseColor.isLight ? _lightColor : _darkColor;
 
-  double get _total =>
-      products.map<double>((p) => p.total).reduce((a, b) => a + b);
+  // double get _total =>
+  //     products.map<double>((p) => p.total).reduce((a, b) => a + b);
 
-  double get _grandTotal => _total * (1 + tax);
+  // double get _grandTotal => _total * (1 + tax);
 
   // String? _logo;
 
@@ -96,15 +96,29 @@ class Invoice {
           await PdfGoogleFonts.robotoBold(),
           await PdfGoogleFonts.robotoItalic(),
         ),
-        header: _buildHeader,
+        // header: _buildHeader,
         footer: _buildFooter,
         build: (context) => [
+          // _buildHeader(context),
           _contentHeader(context),
-          _contentTable(context),
+          pw.SizedBox(height: 20),
+          pw.Text(
+            "PASSENGERS TICKETS",
+            style: const pw.TextStyle(fontSize: 18, color: PdfColors.blue),
+          ),
+          pw.SizedBox(height: 10),
+          _contentPassengerTable(context),
+          pw.SizedBox(height: 40),
+          pw.Text(
+            "LUGGAGE TICKETS",
+            style: const pw.TextStyle(fontSize: 18, color: PdfColors.orange800),
+          ),
+          pw.SizedBox(height: 10),
+          _contentLuggageTable(context),
           pw.SizedBox(height: 20),
           _contentFooter(context),
           pw.SizedBox(height: 20),
-          _termsAndConditions(context),
+          // _termsAndConditions(context),
         ],
       ),
     );
@@ -113,101 +127,32 @@ class Invoice {
     return doc.save();
   }
 
-  pw.Widget _buildHeader(pw.Context context) {
-    return pw.Column(
-      children: [
-        pw.Row(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Expanded(
-              child: pw.Column(
-                children: [
-                  pw.Container(
-                    height: 50,
-                    padding: const pw.EdgeInsets.only(left: 20),
-                    alignment: pw.Alignment.centerLeft,
-                    child: pw.Text(
-                      'COMPANY NAME',
-                      style: pw.TextStyle(
-                        color: baseColor,
-                        fontWeight: pw.FontWeight.bold,
-                        fontSize: 30,
-                      ),
-                    ),
-                  ),
-                  pw.Container(
-                    decoration: pw.BoxDecoration(
-                      borderRadius:
-                          const pw.BorderRadius.all(pw.Radius.circular(2)),
-                      color: accentColor,
-                    ),
-                    padding: const pw.EdgeInsets.only(
-                        left: 40, top: 10, bottom: 10, right: 20),
-                    alignment: pw.Alignment.centerLeft,
-                    height: 50,
-                    child: pw.DefaultTextStyle(
-                      style: pw.TextStyle(
-                        color: _accentTextColor,
-                        fontSize: 12,
-                      ),
-                      child: pw.GridView(
-                        crossAxisCount: 2,
-                        children: [
-                          pw.Text('Trip #'),
-                          pw.Text(invoiceNumber),
-                          pw.Text('Date:'),
-                          pw.Text(_formatDate(DateTime.now())),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            pw.Expanded(
-              child: pw.Column(
-                mainAxisSize: pw.MainAxisSize.min,
-                children: [
-                  pw.Container(
-                    alignment: pw.Alignment.topRight,
-                    padding: const pw.EdgeInsets.only(bottom: 8, left: 30),
-                    height: 72,
-                    child:
-                        pw.PdfLogo(),
-                  ),
-                  // pw.Container(
-                  //   color: baseColor,
-                  //   padding: pw.EdgeInsets.only(top: 3),
-                  // ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        if (context.pageNumber > 1) pw.SizedBox(height: 20)
-      ],
-    );
-  }
-
   pw.Widget _buildFooter(pw.Context context) {
     return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.end,
       children: [
-        pw.Container(
-          height: 20,
-          width: 100,
-          child: pw.BarcodeWidget(
-            barcode: pw.Barcode.pdf417(),
-            data: 'Invoice# $invoiceNumber',
-            drawText: false,
+        pw.Column(children: [
+          pw.Container(
+            height: 20,
+            width: 100,
+            child: pw.BarcodeWidget(
+              barcode: pw.Barcode.pdf417(),
+              data: '123456',
+              drawText: true,
+            ),
           ),
-        ),
+          pw.Text(
+            'POWERED BY BUSLINE',
+            style: const pw.TextStyle(
+              fontSize: 12,
+            ),
+          ),
+        ]),
         pw.Text(
           'Page ${context.pageNumber}/${context.pagesCount}',
           style: const pw.TextStyle(
             fontSize: 12,
-            color: PdfColors.white,
           ),
         ),
       ],
@@ -231,69 +176,169 @@ class Invoice {
   }
 
   pw.Widget _contentHeader(pw.Context context) {
-    return pw.Row(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
+    return pw.Column(
       children: [
-        pw.Expanded(
-          child: pw.Container(
-            margin: const pw.EdgeInsets.symmetric(horizontal: 20),
-            height: 70,
-            child: pw.FittedBox(
-              child: pw.Text(
-                'Total: ${_formatCurrency(_grandTotal)}',
-                style: pw.TextStyle(
-                  color: baseColor,
-                  fontStyle: pw.FontStyle.italic,
+        pw.Column(
+          children: [
+            pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                pw.Expanded(
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Center(
+                        child: pw.Text(
+                          'COMPANY NAME',
+                          style: pw.TextStyle(
+                            // color: baseColor,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 24,
+                          ),
+                        ),
+                      ),
+                      pw.Text(
+                        'Company Address',
+                        style: const pw.TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      pw.Text(
+                        'Company Phone number',
+                        style: const pw.TextStyle(
+                          fontSize: 14,
+                        ),
+                      ),
+                      pw.Text(
+                        'UAB 123 C',
+                        style: pw.TextStyle(
+                            fontSize: 14, fontWeight: pw.FontWeight.bold),
+                      ),
+                      pw.SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        pw.Row(
+          children: [
+            pw.Expanded(
+              flex: 1,
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Container(
+                    margin: const pw.EdgeInsets.only(bottom: 4),
+                    child: pw.Text(
+                      'Trip Summary:',
+                      style: pw.TextStyle(
+                        color: baseColor,
+                        fontSize: 12,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  pw.DefaultTextStyle(
+                    style: const pw.TextStyle(
+                      fontSize: 10,
+                    ),
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('From:'),
+                            pw.Text('KAMPALA'),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('To:'),
+                            pw.Text('LIRA'),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Fare:'),
+                            pw.Text('20000'),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
+                            pw.Text('Travel Date:'),
+                            pw.Text('Fri 13-11-23 @ 7:00 PM'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            pw.SizedBox(width: 50),
+            pw.Expanded(
+              flex: 1,
+              child: pw.DefaultTextStyle(
+                style: const pw.TextStyle(
+                  fontSize: 10,
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Container(
+                      margin: const pw.EdgeInsets.only(bottom: 4),
+                      child: pw.Text(
+                        'Fare Summary:',
+                        style: pw.TextStyle(
+                            color: baseColor,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 12),
+                      ),
+                    ),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Passengers:'),
+                        pw.Text('UGX 1,200,000'),
+                      ],
+                    ),
+                    pw.SizedBox(height: 5),
+                    pw.Row(
+                      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                      children: [
+                        pw.Text('Luggage:'),
+                        pw.Text('UGX 2,150,000'),
+                      ],
+                    ),
+                    pw.Divider(color: accentColor),
+                    pw.DefaultTextStyle(
+                      style: pw.TextStyle(
+                        color: baseColor,
+                        fontSize: 14,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                      child: pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text('Total:'),
+                          pw.Text('3,350,000'),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ),
-        pw.Expanded(
-          child: pw.Row(
-            children: [
-              pw.Container(
-                margin: const pw.EdgeInsets.only(left: 10, right: 10),
-                height: 70,
-                child: pw.Text(
-                  'Invoice to:',
-                  style: pw.TextStyle(
-                    color: _darkColor,
-                    fontWeight: pw.FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-              pw.Expanded(
-                child: pw.Container(
-                  height: 70,
-                  child: pw.RichText(
-                      text: pw.TextSpan(
-                          text: '$customerName\n',
-                          style: pw.TextStyle(
-                            color: _darkColor,
-                            fontWeight: pw.FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                          children: [
-                        const pw.TextSpan(
-                          text: '\n',
-                          style: pw.TextStyle(
-                            fontSize: 5,
-                          ),
-                        ),
-                        pw.TextSpan(
-                          text: customerAddress,
-                          style: pw.TextStyle(
-                            fontWeight: pw.FontWeight.normal,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ])),
-                ),
-              ),
-            ],
-          ),
+          ],
         ),
       ],
     );
@@ -308,76 +353,27 @@ class Invoice {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Text(
-                'Thank you for your business',
-                style: pw.TextStyle(
-                  color: _darkColor,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
               pw.Container(
                 margin: const pw.EdgeInsets.only(top: 20, bottom: 8),
                 child: pw.Text(
-                  'Payment Info:',
+                  'Staff Signatures',
                   style: pw.TextStyle(
                     color: baseColor,
                     fontWeight: pw.FontWeight.bold,
                   ),
                 ),
               ),
-              pw.Text(
-                paymentInfo,
-                style: const pw.TextStyle(
-                  fontSize: 8,
-                  lineSpacing: 5,
-                  color: _darkColor,
-                ),
+              pw.ListView.builder(
+                itemCount: 5,
+                itemBuilder: (_, index) {
+                  return pw.Padding(
+                      padding: const pw.EdgeInsets.only(bottom: 8),
+                      child: pw.Text(
+                        "Staff Names 12345$index (ROLE)",
+                      ));
+                },
               ),
             ],
-          ),
-        ),
-        pw.Expanded(
-          flex: 1,
-          child: pw.DefaultTextStyle(
-            style: const pw.TextStyle(
-              fontSize: 10,
-              color: _darkColor,
-            ),
-            child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('Sub Total:'),
-                    pw.Text(_formatCurrency(_total)),
-                  ],
-                ),
-                pw.SizedBox(height: 5),
-                pw.Row(
-                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pw.Text('Tax:'),
-                    pw.Text('${(tax * 100).toStringAsFixed(1)}%'),
-                  ],
-                ),
-                pw.Divider(color: accentColor),
-                pw.DefaultTextStyle(
-                  style: pw.TextStyle(
-                    color: baseColor,
-                    fontSize: 14,
-                    fontWeight: pw.FontWeight.bold,
-                  ),
-                  child: pw.Row(
-                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                    children: [
-                      pw.Text('Total:'),
-                      pw.Text(_formatCurrency(_grandTotal)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
       ],
@@ -410,7 +406,7 @@ class Invoice {
                 pw.LoremText().paragraph(40),
                 textAlign: pw.TextAlign.justify,
                 style: const pw.TextStyle(
-                  fontSize: 6,
+                  // fontSize: 6,
                   lineSpacing: 2,
                   color: _darkColor,
                 ),
@@ -425,21 +421,79 @@ class Invoice {
     );
   }
 
-  pw.Widget _contentTable(pw.Context context) {
+  pw.Widget _contentPassengerTable(pw.Context context) {
     const tableHeaders = [
-      'SKU#',
-      'Item Description',
-      'Price',
-      'Quantity',
-      'Total'
+      'Ticket #',
+      'Passenger Names',
+      'Seat #',
+      'From',
+      'To',
+      'Fare'
     ];
 
     return pw.TableHelper.fromTextArray(
       border: null,
       cellAlignment: pw.Alignment.centerLeft,
-      headerDecoration: pw.BoxDecoration(
-        borderRadius: const pw.BorderRadius.all(pw.Radius.circular(2)),
-        color: baseColor,
+      headerDecoration: const pw.BoxDecoration(
+        borderRadius: pw.BorderRadius.all(pw.Radius.circular(2)),
+        color: PdfColors.blue,
+      ),
+      headerHeight: 25,
+      cellHeight: 40,
+      cellAlignments: {
+        0: pw.Alignment.centerLeft,
+        1: pw.Alignment.centerLeft,
+        2: pw.Alignment.center,
+        3: pw.Alignment.centerLeft,
+        4: pw.Alignment.centerLeft,
+        5: pw.Alignment.centerRight,
+      },
+      headerStyle: pw.TextStyle(
+        color: _baseTextColor,
+        fontSize: 10,
+        fontWeight: pw.FontWeight.bold,
+      ),
+      cellStyle: const pw.TextStyle(
+        color: _darkColor,
+        fontSize: 10,
+      ),
+      rowDecoration: pw.BoxDecoration(
+        border: pw.Border(
+          bottom: pw.BorderSide(
+            color: accentColor,
+            width: .5,
+          ),
+        ),
+      ),
+      headers: List<String>.generate(
+        tableHeaders.length,
+        (col) => tableHeaders[col],
+      ),
+      data: List<List<String>>.generate(
+        products.length,
+        (row) => List<String>.generate(
+          tableHeaders.length,
+          (col) => products[row].getIndex(col),
+        ),
+      ),
+    );
+  }
+
+  pw.Widget _contentLuggageTable(pw.Context context) {
+    const tableHeaders = [
+      'Ticket #',
+      'Luggage Description',
+      'Receiver',
+      'Destination',
+      'Fare'
+    ];
+
+    return pw.TableHelper.fromTextArray(
+      border: null,
+      cellAlignment: pw.Alignment.centerLeft,
+      headerDecoration: const pw.BoxDecoration(
+        borderRadius: pw.BorderRadius.all(pw.Radius.circular(2)),
+        color: PdfColors.orange800,
       ),
       headerHeight: 25,
       cellHeight: 40,
@@ -494,29 +548,34 @@ String _formatDate(DateTime date) {
 class Product {
   const Product(
     this.sku,
-    this.productName,
-    this.price,
-    this.quantity,
+    this.passengerNames,
+    this.seatNo,
+    this.toDest,
+    this.fromDest,
+    this.total,
   );
 
   final String sku;
-  final String productName;
-  final double price;
-  final int quantity;
-  double get total => price * quantity;
+  final String passengerNames;
+  final int seatNo;
+  final String fromDest;
+  final String toDest;
+  final int total;
 
   String getIndex(int index) {
     switch (index) {
       case 0:
         return sku;
       case 1:
-        return productName;
+        return passengerNames;
       case 2:
-        return _formatCurrency(price);
+        return seatNo.toString();
       case 3:
-        return quantity.toString();
+        return fromDest.toString();
       case 4:
-        return _formatCurrency(total);
+        return toDest.toString();
+      case 5:
+        return total.toString();
     }
     return '';
   }

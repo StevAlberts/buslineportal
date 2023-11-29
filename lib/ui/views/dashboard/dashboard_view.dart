@@ -29,207 +29,110 @@ class DashboardView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pageIndexNotifier = ValueNotifier(0);
-
     var firebaseUSer = FirebaseAuth.instance.currentUser;
     final streamUser = ref.watch(StreamCurrentUserProvider(firebaseUSer!.uid));
 
-    WoltModalSheetPage profileDialogPage(
-      BuildContext modalSheetContext,
-      TextTheme textTheme,
-      UserModel? user,
-      Company? company,
-    ) {
-      return WoltModalSheetPage.withSingleChild(
-        hasSabGradient: false,
-        topBarTitle: Text('Profile', style: textTheme.titleLarge),
-        isTopBarLayerAlwaysVisible: true,
-        trailingNavBarWidget: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: IconButton(
-            padding: const EdgeInsets.all(8.0),
-            icon: const Icon(Icons.close),
-            onPressed: Navigator.of(modalSheetContext).pop,
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Consumer(builder: (context, ref, child) {
-            return Column(
-              children: [
-                Column(
-                  children: [
-                    TextAvatar(
-                      text: company?.name.toUpperCase(),
-                      shape: Shape.Circular,
-                      numberLetters: 2,
-                      upperCase: true,
-                      fontSize: 20,
-                      size: 100,
-                    ),
-                    ListTile(
-                      title:
-                          Center(child: Text("${company?.name.toUpperCase()}")),
-                      // subtitle: Center(child: Text("${company?.id.toUpperCase()}")),
-                      subtitle: Center(
-                        child: Card(
-                          color: roleCardColor(user!.role!),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("Code: ${company?.id}"),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                ListTile(
-                  leading: CircleAvatar(
-                    child: TextAvatar(
-                      text: '${user.firstName} ${user.lastName}'.toUpperCase(),
-                      shape: Shape.Circular,
-                      numberLetters: 2,
-                      upperCase: true,
-                    ),
-                  ),
-                  title: Text("${user.firstName} ${user.lastName}"),
-                  subtitle: Text("${user.email}"),
-                  trailing: Card(
-                    color: roleCardColor(user.role!),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(user.role!.toUpperCase()),
-                    ),
-                  ),
-                ),
-                const Divider(),
-                FilledButton(
-                  style: FilledButton.styleFrom(backgroundColor: Colors.red),
-                  onPressed: () {},
-                  child: const Text("Logout"),
-                ),
-                const SizedBox(height: 20),
-              ],
-            );
-          }),
-        ),
-      );
-    }
-
     return streamUser.when(
       data: (user) => Consumer(builder: (context, ref, child) {
-        final companyStream =
-            ref.watch(StreamCompanyProvider(user!.companyIds.first));
+        final companyStream = ref.watch(StreamCompanyProvider(user!.companyId));
 
         return companyStream.when(
           data: (company) {
             return Scaffold(
-              appBar: AppBar(
-                title: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: paddingBarWidth(context)),
-                  child: const Text("Dashboard"),
-                ),
-                actions: [
-                  Padding(
-                    padding: EdgeInsets.only(right: paddingBarWidth(context)),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ProfileView(company: company!, user: user),
-                          ),
-                        );
-                        // WoltModalSheet.show<void>(
-                        //   pageIndexNotifier: pageIndexNotifier,
-                        //   context: context,
-                        //   barrierDismissible: false,
-                        //   pageListBuilder: (modalSheetContext) {
-                        //     final textTheme = Theme.of(context).textTheme;
-                        //     return [
-                        //       profileDialogPage(
-                        //         modalSheetContext,
-                        //         textTheme,
-                        //         user,
-                        //         company,
-                        //       ),
-                        //     ];
-                        //   },
-                        //   modalTypeBuilder: (context) {
-                        //     final size = MediaQuery.of(context).size.width;
-                        //     if (size < 400) {
-                        //       return WoltModalType.bottomSheet;
-                        //     } else {
-                        //       return WoltModalType.dialog;
-                        //     }
-                        //   },
-                        //   onModalDismissedWithBarrierTap: () {
-                        //     debugPrint('Closed modal sheet with barrier tap');
-                        //     Navigator.of(context).pop();
-                        //     pageIndexNotifier.value = 0;
-                        //   },
-                        //   maxDialogWidth: 560,
-                        //   minDialogWidth: 400,
-                        //   minPageHeight: 0.0,
-                        //   maxPageHeight: 0.9,
-                        // );
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text("${user.firstName?.toUpperCase()}"),
-                          ),
-                          CircleAvatar(
-                            child: TextAvatar(
-                              text: '${user.firstName} ${user.lastName}'
-                                  .toUpperCase(),
-                              shape: Shape.Circular,
-                              numberLetters: 2,
-                              upperCase: true,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              // appBar: AppBar(
+              //   actions: [
+              //     Padding(
+              //       padding: EdgeInsets.only(right: paddingBarWidth(context)),
+              //       child: InkWell(
+              //         onTap: () {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) =>
+              //                   ProfileView(company: company!, user: user),
+              //             ),
+              //           );
+              //           // WoltModalSheet.show<void>(
+              //           //   pageIndexNotifier: pageIndexNotifier,
+              //           //   context: context,
+              //           //   barrierDismissible: false,
+              //           //   pageListBuilder: (modalSheetContext) {
+              //           //     final textTheme = Theme.of(context).textTheme;
+              //           //     return [
+              //           //       profileDialogPage(
+              //           //         modalSheetContext,
+              //           //         textTheme,
+              //           //         user,
+              //           //         company,
+              //           //       ),
+              //           //     ];
+              //           //   },
+              //           //   modalTypeBuilder: (context) {
+              //           //     final size = MediaQuery.of(context).size.width;
+              //           //     if (size < 400) {
+              //           //       return WoltModalType.bottomSheet;
+              //           //     } else {
+              //           //       return WoltModalType.dialog;
+              //           //     }
+              //           //   },
+              //           //   onModalDismissedWithBarrierTap: () {
+              //           //     debugPrint('Closed modal sheet with barrier tap');
+              //           //     Navigator.of(context).pop();
+              //           //     pageIndexNotifier.value = 0;
+              //           //   },
+              //           //   maxDialogWidth: 560,
+              //           //   minDialogWidth: 400,
+              //           //   minPageHeight: 0.0,
+              //           //   maxPageHeight: 0.9,
+              //           // );
+              //         },
+              //         child: Row(
+              //           mainAxisSize: MainAxisSize.min,
+              //           children: [
+              //             Padding(
+              //               padding: const EdgeInsets.all(8.0),
+              //               child: Text("${user.firstName?.toUpperCase()}"),
+              //             ),
+              //             CircleAvatar(
+              //               child: TextAvatar(
+              //                 text: '${user.firstName} ${user.lastName}'
+              //                     .toUpperCase(),
+              //                 shape: Shape.Circular,
+              //                 numberLetters: 2,
+              //                 upperCase: true,
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
               body: Padding(
-                padding:
-                    EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+                padding: const EdgeInsets.all(8.0),
                 child: ListView(
                   padding: const EdgeInsets.all(8.0),
                   children: [
-                    FilledButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ReportView(),
-                          ),
-                        );
-                      },
-                      child: const Text("GO"),
-                    ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FilledButton(
-                        onPressed: () async {
-                          FirebaseAuth auth = FirebaseAuth.instance;
-
-// Wait for the user to complete the reCAPTCHA & for an SMS code to be sent.
-                          ConfirmationResult confirmationResult =
-                              await auth.signInWithPhoneNumber('+256705271731');
-
-                          print(confirmationResult.verificationId);
-                        },
-                        child: const Text("GO"),
+                      padding: const EdgeInsets.all(20.0),
+                      child: Center(
+                        child: Text(
+                          "${company?.name.toUpperCase()}",
+                          style: Theme.of(context).textTheme.headlineLarge,
+                        ),
                       ),
                     ),
+                    // FilledButton(
+                    //   onPressed: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (context) => const ReportView(),
+                    //       ),
+                    //     );
+                    //   },
+                    //   child: const Text("SEE PDF"),
+                    // ),
                     ListTile(
                       leading: const Icon(Icons.group),
                       title: const Text("Employees"),
@@ -305,7 +208,6 @@ class DashboardView extends ConsumerWidget {
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (context, index) {
-
                               var request = company.requests[index];
                               var names = request['name'];
                               var deviceName = request['deviceName'];
@@ -346,17 +248,39 @@ class DashboardView extends ConsumerWidget {
                                             .acceptEmployeeRequest(id, deviceId,
                                                 deviceName, context)
                                             .then((value) {
-                                          // clean requests
-                                          databaseService.removeEmployeeRequest(
-                                              companyId, request);
+                                          if (value == null) {
+                                            // clean requests
+                                            databaseService
+                                                .removeEmployeeRequest(
+                                              companyId,
+                                              request,
+                                            );
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content:
+                                                    Text("Request accepted"),
+                                              ),
+                                            );
+                                          }
+                                        }).onError((error, stackTrace) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: ListTile(
+                                                leading: Icon(
+                                                  Icons.error_outline,
+                                                  color: Colors.red,
+                                                ),
+                                                title: Text(
+                                                  'Staff NOT_FOUND: please confirm with sender.',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ),
+                                          );
                                         });
-
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text("Request accepted"),
-                                          ),
-                                        );
                                       },
                                       child: const Text("ACCEPT"),
                                     ),
@@ -374,8 +298,8 @@ class DashboardView extends ConsumerWidget {
                         // final companyData =
                         //     ref.watch(StreamCompanyProvider(user!.companyIds.first));
 
-                        final currentTripsStream = ref.watch(
-                            StreamMovingTripsProvider(user.companyIds.first));
+                        final currentTripsStream = ref
+                            .watch(StreamMovingTripsProvider(user.companyId!));
 
                         return Column(
                           children: [

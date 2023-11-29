@@ -48,7 +48,7 @@ class _ProfileViewState extends State<ProfileView> {
               },
             ),
             TextButton(
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              style: TextButton.styleFrom(foregroundColor: Colors.grey),
               child: const Text('OK'),
               onPressed: () {
                 // Log user out
@@ -61,7 +61,6 @@ class _ProfileViewState extends State<ProfileView> {
       },
     );
   }
-
 
   WoltModalSheetPage updateManagerPage(
     BuildContext modalSheetContext,
@@ -244,6 +243,13 @@ class _ProfileViewState extends State<ProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: Text(
+          "Account",
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .copyWith(color: Colors.white),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -256,59 +262,74 @@ class _ProfileViewState extends State<ProfileView> {
         ],
       ),
       body: ListView(
-        padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+        padding: const EdgeInsets.all(16.0),
         children: [
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextAvatar(
-                  text: widget.company.name.toUpperCase(),
-                  shape: Shape.Circular,
-                  numberLetters: 2,
-                  upperCase: true,
-                  fontSize: 20,
-                  size: 100,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextAvatar(
+                    text: widget.company.name,
+                    shape: Shape.Circular,
+                    numberLetters: 2,
+                    upperCase: true,
+                    fontSize: 30,
+                    size: 100,
+                  ),
                 ),
-              ),
-              ListTile(
-                title: Center(child: Text(widget.company.name.toUpperCase())),
-                // subtitle: Center(child: Text("${company?.id.toUpperCase()}")),
-                subtitle: Center(
-                  child: Card(
-                    color: roleCardColor(widget.user.role!),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text("Code: ${widget.company.id}"),
+                ListTile(
+                  title: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Text(
+                        widget.company.name.toUpperCase(),
+                      ),
+                    ),
+                  ),
+                  subtitle: Center(
+                    child: Card(
+                      color: roleCardColor(widget.user.role!),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(widget.company.id),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Center(child: Text("Manage profile and account settings")),
+          ),
+          const Divider(),
           ListTile(
             leading: CircleAvatar(
               child: TextAvatar(
-                text: '${widget.user.firstName} ${widget.user.lastName}'
-                    .toUpperCase(),
+                text: "${widget.user.firstName} ${widget.user.lastName}",
                 shape: Shape.Circular,
                 numberLetters: 2,
                 upperCase: true,
               ),
             ),
-            title: Text("${widget.user.firstName} ${widget.user.lastName}"),
+            title: Text("${widget.user.firstName} ${widget.user.lastName}"
+                .toUpperCase()),
             subtitle: Text("${widget.user.email}"),
-            trailing: Card(
-              color: roleCardColor(widget.user.email!),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(widget.user.role!.toUpperCase()),
-              ),
-            ),
           ),
           const Divider(),
           ListTile(
-            title: Text("Company Managers"),
+            leading: const Icon(Icons.security),
+            title: Text("${widget.user.role?.toUpperCase()}"),
+            subtitle: const Text("Roles and Permissions"),
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.manage_accounts),
+            title: const Text("Company Managers"),
+            subtitle: const Text("Create and invite account managers to the portal"),
             trailing: Padding(
               padding: const EdgeInsets.all(8.0),
               child: FilledButton.icon(
@@ -344,15 +365,15 @@ class _ProfileViewState extends State<ProfileView> {
                     maxPageHeight: 0.9,
                   );
                 },
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
                 label: const Text("Invite"),
               ),
             ),
           ),
           ListView.separated(
-            itemCount: 5,
+            itemCount: 0,
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
               return ListTile(
                 leading: CircleAvatar(
@@ -363,19 +384,19 @@ class _ProfileViewState extends State<ProfileView> {
                     upperCase: true,
                   ),
                 ),
-                title: Text("{employee.firstName} {employee.lastName}"),
-                subtitle: Text("ID {employee.id.toUpperCase()}"),
+                title: const Text("{employee.firstName} {employee.lastName}"),
+                subtitle: const Text("ID {employee.id.toUpperCase()}"),
                 onTap: () {},
                 trailing: Card(
                   color: roleCardColor("employee.role"),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Text("employee.role.toUpperCase()"),
                   ),
                 ),
               );
             },
-            separatorBuilder: (context, index) => Divider(),
+            separatorBuilder: (context, index) => const Divider(),
           ),
           const SizedBox(height: 20),
         ],

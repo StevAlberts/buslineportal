@@ -759,264 +759,261 @@ class _EmployeeViewState extends ConsumerState<EmployeeView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  context.pushReplacement('/');
-                },
-                child: const Text(
-                  "Dashboard",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              const Text(" / Employees"),
-            ],
-          ),
+        title: Text(
+          "Staff",
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .copyWith(color: Colors.white),
         ),
       ),
       body: currentUserStream.when(
         data: (user) {
-          String compId = user!.companyIds.first;
+          String compId = user!.companyId!;
 
           return Consumer(builder: (context, ref, child) {
             final employeesStream =
                 ref.watch(StreamCompanyEmployeesProvider(compId));
 
-            return ListView(
-              padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
-              children: [
-                ListTile(
-                  title: const Text("Staff list"),
-                  subtitle: const Text("Create and manage company staff"),
-                  trailing: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                          backgroundColor: Colors.lightBlue),
-                      icon: const Icon(Icons.add),
-                      label: const Text("New"),
-                      onPressed: () {
-                        WoltModalSheet.show<void>(
-                          pageIndexNotifier: pageCreateIndexNotifier,
-                          context: context,
-                          barrierDismissible: false,
-                          pageListBuilder: (modalSheetContext) {
-                            final textTheme = Theme.of(context).textTheme;
-                            return [
-                              // new staff
-                              createStaffPage(
-                                  modalSheetContext, textTheme, compId),
-                            ];
-                          },
-                          modalTypeBuilder: (context) {
-                            final size = MediaQuery.of(context).size.width;
-                            if (size < 400) {
-                              return WoltModalType.bottomSheet;
-                            } else {
-                              return WoltModalType.dialog;
-                            }
-                          },
-                          onModalDismissedWithBarrierTap: () {
-                            debugPrint('Closed modal sheet with barrier tap');
-                            Navigator.of(context).pop();
-                            pageCreateIndexNotifier.value = 0;
-                          },
-                          maxDialogWidth: 560,
-                          minDialogWidth: 400,
-                          minPageHeight: 0.0,
-                          maxPageHeight: 0.9,
-                        );
-                      },
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView(
+                padding: const EdgeInsets.all(8.0),
+                children: [
+
+                  ListTile(
+                    // title: const Text("Staff list"),
+                    title: const Text("Create and manage company employees"),
+                    trailing: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                            backgroundColor: Colors.lightBlue),
+                        icon: const Icon(Icons.add),
+                        label: const Text("New"),
+                        onPressed: () {
+                          WoltModalSheet.show<void>(
+                            pageIndexNotifier: pageCreateIndexNotifier,
+                            context: context,
+                            barrierDismissible: false,
+                            pageListBuilder: (modalSheetContext) {
+                              final textTheme = Theme.of(context).textTheme;
+                              return [
+                                // new staff
+                                createStaffPage(
+                                    modalSheetContext, textTheme, compId),
+                              ];
+                            },
+                            modalTypeBuilder: (context) {
+                              final size = MediaQuery.of(context).size.width;
+                              if (size < 400) {
+                                return WoltModalType.bottomSheet;
+                              } else {
+                                return WoltModalType.dialog;
+                              }
+                            },
+                            onModalDismissedWithBarrierTap: () {
+                              debugPrint('Closed modal sheet with barrier tap');
+                              Navigator.of(context).pop();
+                              pageCreateIndexNotifier.value = 0;
+                            },
+                            maxDialogWidth: 560,
+                            minDialogWidth: 400,
+                            minPageHeight: 0.0,
+                            maxPageHeight: 0.9,
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-                employeesStream.when(
-                  data: (employees) {
-                    return employees.isNotEmpty
-                        ? ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: employees.length,
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const Divider(height: 0),
-                            itemBuilder: (context, index) {
-                              var employee = employees[index];
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  child: TextAvatar(
-                                    text:
-                                        '${employee.firstName} ${employee.lastName}'
-                                            .toUpperCase(),
-                                    shape: Shape.Circular,
-                                    numberLetters: 2,
-                                    upperCase: true,
+                  employeesStream.when(
+                    data: (employees) {
+                      return employees.isNotEmpty
+                          ? ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: employees.length,
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      const Divider(height: 0),
+                              itemBuilder: (context, index) {
+                                var employee = employees[index];
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    child: TextAvatar(
+                                      text:
+                                          '${employee.firstName} ${employee.lastName}'
+                                              .toUpperCase(),
+                                      shape: Shape.Circular,
+                                      numberLetters: 2,
+                                      upperCase: true,
+                                    ),
                                   ),
-                                ),
-                                title: Text(
-                                    "${employee.firstName} ${employee.lastName}"),
-                                subtitle:
-                                    Text("ID ${employee.id.toUpperCase()}"),
-                                onTap: () {
-                                  WoltModalSheet.show<void>(
-                                    pageIndexNotifier: pageIndexNotifier,
-                                    context: context,
-                                    barrierDismissible: false,
-                                    pageListBuilder: (modalSheetContext) {
-                                      final textTheme =
-                                          Theme.of(context).textTheme;
-                                      return [
-                                        // staff details view
-                                        staffDetailsPage(modalSheetContext,
-                                            textTheme, employee, compId),
+                                  title: Text(
+                                      "${employee.firstName} ${employee.lastName}"),
+                                  subtitle:
+                                      Text("ID ${employee.id.toUpperCase()}"),
+                                  onTap: () {
+                                    WoltModalSheet.show<void>(
+                                      pageIndexNotifier: pageIndexNotifier,
+                                      context: context,
+                                      barrierDismissible: false,
+                                      pageListBuilder: (modalSheetContext) {
+                                        final textTheme =
+                                            Theme.of(context).textTheme;
+                                        return [
+                                          // staff details view
+                                          staffDetailsPage(modalSheetContext,
+                                              textTheme, employee, compId),
 
-                                        // page edit view
-                                        editStaffPage(
-                                          modalSheetContext,
-                                          textTheme,
-                                          employee,
-                                        ),
+                                          // page edit view
+                                          editStaffPage(
+                                            modalSheetContext,
+                                            textTheme,
+                                            employee,
+                                          ),
 
-                                        // page delete view
-                                        confirmDeletePage(
-                                          modalSheetContext,
-                                          textTheme,
-                                          employee,
-                                        ),
-                                      ];
-                                    },
-                                    modalTypeBuilder: (context) {
-                                      final size =
-                                          MediaQuery.of(context).size.width;
-                                      if (size < 400) {
-                                        return WoltModalType.bottomSheet;
-                                      } else {
-                                        return WoltModalType.dialog;
-                                      }
-                                    },
-                                    onModalDismissedWithBarrierTap: () {
-                                      debugPrint(
-                                          'Closed modal sheet with barrier tap');
-                                      Navigator.of(context).pop();
-                                      pageIndexNotifier.value = 0;
-                                    },
-                                    maxDialogWidth: 560,
-                                    minDialogWidth: 400,
-                                    minPageHeight: 0.0,
-                                    maxPageHeight: 0.9,
-                                  );
-                                },
-                                trailing: Card(
-                                  color: roleCardColor(employee.role),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(employee.role.toUpperCase()),
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : Center(
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    height: 250,
-                                    width: 400,
-                                    color: Colors.grey.shade200,
+                                          // page delete view
+                                          confirmDeletePage(
+                                            modalSheetContext,
+                                            textTheme,
+                                            employee,
+                                          ),
+                                        ];
+                                      },
+                                      modalTypeBuilder: (context) {
+                                        final size =
+                                            MediaQuery.of(context).size.width;
+                                        if (size < 400) {
+                                          return WoltModalType.bottomSheet;
+                                        } else {
+                                          return WoltModalType.dialog;
+                                        }
+                                      },
+                                      onModalDismissedWithBarrierTap: () {
+                                        debugPrint(
+                                            'Closed modal sheet with barrier tap');
+                                        Navigator.of(context).pop();
+                                        pageIndexNotifier.value = 0;
+                                      },
+                                      maxDialogWidth: 560,
+                                      minDialogWidth: 400,
+                                      minPageHeight: 0.0,
+                                      maxPageHeight: 0.9,
+                                    );
+                                  },
+                                  trailing: Card(
+                                    color: roleCardColor(employee.role),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Icon(Icons.person_add),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: FilledButton(
-                                              style: FilledButton.styleFrom(
-                                                  backgroundColor:
-                                                      Colors.green),
-                                              onPressed: () {
-                                                WoltModalSheet.show<void>(
-                                                  pageIndexNotifier:
-                                                      pageCreateIndexNotifier,
-                                                  context: context,
-                                                  barrierDismissible: false,
-                                                  pageListBuilder:
-                                                      (modalSheetContext) {
-                                                    final textTheme =
-                                                        Theme.of(context)
-                                                            .textTheme;
-                                                    return [
-                                                      // new staff
-                                                      createStaffPage(
-                                                          modalSheetContext,
-                                                          textTheme,
-                                                          compId),
-                                                    ];
-                                                  },
-                                                  modalTypeBuilder: (context) {
-                                                    final size =
-                                                        MediaQuery.of(context)
-                                                            .size
-                                                            .width;
-                                                    if (size < 400) {
-                                                      return WoltModalType
-                                                          .bottomSheet;
-                                                    } else {
-                                                      return WoltModalType
-                                                          .dialog;
-                                                    }
-                                                  },
-                                                  onModalDismissedWithBarrierTap:
-                                                      () {
-                                                    debugPrint(
-                                                        'Closed modal sheet with barrier tap');
-                                                    Navigator.of(context).pop();
-                                                    pageCreateIndexNotifier
-                                                        .value = 0;
-                                                  },
-                                                  maxDialogWidth: 560,
-                                                  minDialogWidth: 400,
-                                                  minPageHeight: 0.0,
-                                                  maxPageHeight: 0.9,
-                                                );
-                                              },
-                                              child: const Text("Add Staff"),
+                                      child: Text(employee.role.toUpperCase()),
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : Center(
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                      height: 250,
+                                      width: 400,
+                                      color: Colors.grey.shade200,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Icon(Icons.person_add),
                                             ),
-                                          ),
-                                          const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "No employees. Please tap + add new staff",
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: FilledButton(
+                                                style: FilledButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.green),
+                                                onPressed: () {
+                                                  WoltModalSheet.show<void>(
+                                                    pageIndexNotifier:
+                                                        pageCreateIndexNotifier,
+                                                    context: context,
+                                                    barrierDismissible: false,
+                                                    pageListBuilder:
+                                                        (modalSheetContext) {
+                                                      final textTheme =
+                                                          Theme.of(context)
+                                                              .textTheme;
+                                                      return [
+                                                        // new staff
+                                                        createStaffPage(
+                                                            modalSheetContext,
+                                                            textTheme,
+                                                            compId),
+                                                      ];
+                                                    },
+                                                    modalTypeBuilder:
+                                                        (context) {
+                                                      final size =
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width;
+                                                      if (size < 400) {
+                                                        return WoltModalType
+                                                            .bottomSheet;
+                                                      } else {
+                                                        return WoltModalType
+                                                            .dialog;
+                                                      }
+                                                    },
+                                                    onModalDismissedWithBarrierTap:
+                                                        () {
+                                                      debugPrint(
+                                                          'Closed modal sheet with barrier tap');
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      pageCreateIndexNotifier
+                                                          .value = 0;
+                                                    },
+                                                    maxDialogWidth: 560,
+                                                    minDialogWidth: 400,
+                                                    minPageHeight: 0.0,
+                                                    maxPageHeight: 0.9,
+                                                  );
+                                                },
+                                                child: const Text("Add Staff"),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            const Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                "No employees. Please tap + add new staff",
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                  },
-                  error: (error, stack) {
-                    debugPrint("$error");
-                    return Center(child: Text("$error"));
-                  },
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(),
+                                ],
+                              ),
+                            );
+                    },
+                    error: (error, stack) {
+                      debugPrint("$error");
+                      return Center(child: Text("$error"));
+                    },
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           });
         },

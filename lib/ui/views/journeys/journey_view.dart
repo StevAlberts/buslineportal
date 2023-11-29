@@ -231,7 +231,6 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: FormBuilderDateTimePicker(
@@ -574,38 +573,28 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  context.pushReplacement('/');
-                },
-                child: const Text(
-                  "Dashboard",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              const Text(" / Journeys"),
-            ],
-          ),
+        title: Text(
+          "Trips",
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .copyWith(color: Colors.white),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: currentUserStream.when(
         data: (user) {
           return Consumer(builder: (context, ref, child) {
-            String compId = user?.companyIds.first;
+            String? compId = user?.companyId;
 
             /// TODO: likely to give NULL
             final company =
                 ref.watch(StreamCompanyProvider(compId)).valueOrNull;
 
-            final tripsStream = ref.watch(StreamAllTripsProvider(compId));
+            final tripsStream = ref.watch(StreamAllTripsProvider(compId!));
 
             return ListView(
-              padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
+              padding: const EdgeInsets.all(16.0),
               children: [
                 ListTile(
                   title: const Text("Journey history"),

@@ -26,6 +26,7 @@ class LuggageTicketsView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text("Luggage Tickets"),
       ),
       body: streamPassengerTickets.when(
@@ -68,10 +69,6 @@ class LuggageTicketsView extends ConsumerWidget {
                               Text(luggageTicket.receiverContact),
                             ],
                           ),
-                          trailing: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(luggageTicket.receiverContact),
-                          ),
                         ),
                         // const Divider(),
                         ListTile(
@@ -86,10 +83,6 @@ class LuggageTicketsView extends ConsumerWidget {
                               ),
                               Text(luggageTicket.senderContact),
                             ],
-                          ),
-                          trailing: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(luggageTicket.receiverContact),
                           ),
                         ),
                         // const Divider(),
@@ -136,7 +129,7 @@ class LuggageTicketsView extends ConsumerWidget {
                                   luggageTicket.imgUrls[index],
                                 ),
                                 placeholderBuilder:
-                                OctoPlaceholder.circularProgressIndicator(),
+                                    OctoPlaceholder.circularProgressIndicator(),
                                 errorBuilder: OctoError.icon(color: Colors.red),
                                 fit: BoxFit.cover,
                                 alignment: Alignment.center,
@@ -158,7 +151,6 @@ class LuggageTicketsView extends ConsumerWidget {
                               //     width: 100,
                               //     image: ImageProvider("https://firebasestorage.googleapis.com/v0/b/buslinego.appspot.com/o/images%2Fkampala%2F280426%20(0).jpg?alt=media&token=81368280-9395-4613-97c4-7502c6cd27e3"),
                               // ),
-
                             ),
                           ),
                         ),

@@ -10,7 +10,7 @@ class InviteView extends StatelessWidget {
 
   final _formKey = GlobalKey<FormBuilderState>();
 
-  // https://buslinego.web.app/invite?id=383761&apiKey=AIzaSyCEy2PWLaGNMNMkXcMEWLh8fxXNEDJsXSs&oobCode=6ZXUVAHzKmD4l7rBbizoPeKYbqvuBW26wSjRbzjeftkAAAGL8LBxWg&mode=signIn&lang=en
+  // EXAMPLE: https://buslinego.web.app/invite?id=383761&apiKey=AIzaSyCEy2PWLaGNMNMkXcMEWLh8fxXNEDJsXSs&oobCode=6ZXUVAHzKmD4l7rBbizoPeKYbqvuBW26wSjRbzjeftkAAAGL8LBxWg&mode=signIn&lang=en
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,6 +151,10 @@ class InviteView extends StatelessWidget {
 
                                 /// TODO: Complete link signup
                                 /// Then: Signup email and password
+                                ///
+                                /// Check company address and save details to company mgtRequest
+                                /// Create account for user.
+                                ///
                               }
                             },
                             child: const Padding(

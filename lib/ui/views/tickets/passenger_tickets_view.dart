@@ -15,6 +15,7 @@ class PassengerTicketsView extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: const Text("Passenger Tickets"),
       ),
 

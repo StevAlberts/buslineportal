@@ -227,7 +227,7 @@ class OnboardCompanyProfile extends ConsumerWidget {
                                               userData.phoneNumber ?? phone,
                                           photoURL: userData.photoURL,
                                           role: "admin",
-                                          companyIds: [shortUUIDPrefix],
+                                          companyId: shortUUIDPrefix,
                                         );
 
                                         // create company

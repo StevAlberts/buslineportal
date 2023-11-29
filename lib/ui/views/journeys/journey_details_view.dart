@@ -23,41 +23,23 @@ class JourneyDetailsView extends StatelessWidget {
     // var trip = trips.where((element) => element.id == trip.id)
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Padding(
-          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(Icons.arrow_back_outlined),
-                ),
-              ),
-              Text(trip != null
-                  ? "Journey ID ${trip?.id.toUpperCase()}"
-                  : "Journey destination"),
-            ],
-          ),
-        ),
+        centerTitle: true,
+        title: Text(trip != null
+            ? "Trip ${trip?.id.toUpperCase()}"
+            : ""),
       ),
       body: trip != null
           ? ListView(
               padding: EdgeInsets.symmetric(horizontal: paddingWidth(context)),
               children: [
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: FormBuilderSwitch(
                     name: 'status',
                     // enabled: trip != null,
                     enabled: false,
-                    initialValue: journeyStatusStarted(trip!.isStarted,
-                      trip!.isEnded),
+                    initialValue:
+                        journeyStatusStarted(trip!.isStarted, trip!.isEnded),
                     decoration: const InputDecoration(
                       labelText: 'Journey Status',
                       hintText: "Change journey status",

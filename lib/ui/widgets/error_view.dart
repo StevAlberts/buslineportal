@@ -13,7 +13,8 @@ class ErrorView extends StatelessWidget {
         children: [
           const Icon(
             Icons.error_outline,
-            size: 50,
+            size: 70,
+            color: Colors.grey,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

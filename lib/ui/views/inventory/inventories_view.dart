@@ -44,10 +44,6 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
 
   final TextEditingController iconController = TextEditingController();
 
-  String selectedRoute = 'Kampala';
-
-  final routes = ["Kampala, Lira, Gulu, Soroti"];
-
   WoltModalSheetPage newRoutePage(
     BuildContext modalSheetContext,
     TextTheme textTheme,
@@ -150,12 +146,8 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
     );
   }
 
-  WoltModalSheetPage newBusPage(
-    BuildContext modalSheetContext,
-    TextTheme textTheme,
-    Fleet? fleet,
-      String companyId
-  ) {
+  WoltModalSheetPage newBusPage(BuildContext modalSheetContext,
+      TextTheme textTheme, Fleet? fleet, String companyId) {
     return WoltModalSheetPage.withSingleChild(
       hasSabGradient: false,
       topBarTitle: Text('New Bus', style: textTheme.titleLarge),
@@ -370,7 +362,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
     );
   }
 
-  void showFleetDialog(Fleet? fleet,String companyId) {
+  void showFleetDialog(Fleet? fleet, String companyId) {
     WoltModalSheet.show<void>(
       pageIndexNotifier: pageIndexNotifier,
       context: context,
@@ -378,7 +370,7 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
       pageListBuilder: (modalSheetContext) {
         final textTheme = Theme.of(context).textTheme;
         return [
-          newBusPage(modalSheetContext, textTheme, fleet,companyId),
+          newBusPage(modalSheetContext, textTheme, fleet, companyId),
         ];
       },
       modalTypeBuilder: (context) {
@@ -409,152 +401,145 @@ class _InventoriesViewState extends ConsumerState<InventoriesView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: EdgeInsets.symmetric(horizontal: paddingBarWidth(context)),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  context.pushReplacement('/');
-                },
-                child: const Text(
-                  "Dashboard",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              const Text(" / Inventories"),
-            ],
-          ),
+        title: Text(
+          "Inventories",
+          style: Theme.of(context)
+              .textTheme
+              .headlineSmall!
+              .copyWith(color: Colors.white),
         ),
       ),
       body: currentUserStream.when(
         data: (user) {
           return Consumer(builder: (context, ref, child) {
             final companyStream =
-                ref.watch(StreamCompanyProvider(user!.companyIds.first));
+                ref.watch(StreamCompanyProvider(user!.companyId));
 
             return companyStream.when(
               data: (company) {
-                return ListView(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: paddingWidth(context)),
-                  children: [
-                    ListTile(
-                      title: const Text("Bus Routes"),
-                      subtitle:
-                          const Text("Create and manage destination bus routes"),
-                      trailing: FilledButton(
-                        onPressed: () => showRouteDialog(company?.id),
-                        child: const Text("New Route"),
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ListView(
+                    padding: const EdgeInsets.all(8.0),
+                    children: [
+                      ListTile(
+                        title: const Text("Bus Routes"),
+                        subtitle: const Text(
+                            "Create and manage destination bus routes"),
+                        trailing: FilledButton(
+                          onPressed: () => showRouteDialog(company?.id),
+                          child: const Text("New Route"),
+                        ),
                       ),
-                    ),
-                    company!.destinations.isNotEmpty
-                        ? ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: company.destinations.length,
-                            separatorBuilder:
-                                (BuildContext context, int index) =>
-                                    const Divider(),
-                            itemBuilder: (context, index) => ListTile(
-                              leading: const CircleAvatar(
-                                child: Icon(Icons.location_on),
-                              ),
-                              title: Text(
-                                company.destinations[index]
-                                    .toString()
-                                    .toUpperCase(),
-                              ),
-                              onTap: () => showRouteDialog(company.id,
-                                  destination: company.destinations[index]),
-                            ),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 200,
-                              width: 200,
-                              color: Colors.grey.shade200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: FilledButton(
-                                        style: FilledButton.styleFrom(
-                                            backgroundColor: Colors.green),
-                                        onPressed: () =>
-                                            showRouteDialog(company.id),
-                                        child: const Text("Add Route"),
-                                      ),
-                                    ),
-                                    const Text(
-                                      "No Destinations. Please add a New Route",
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                    const Divider(),
-                    ListTile(
-                      title: const Text("Bus Fleet"),
-                      subtitle: const Text("Create and manage bus fleet"),
-                      trailing: FilledButton(
-                        onPressed: () => showFleetDialog(null,company.id),
-                        child: const Text("New Bus"),
-                      ),
-                    ),
-                    company.fleet.isNotEmpty
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: company.fleet.length,
-                            itemBuilder: (context, index) {
-                              var bus = company.fleet[index];
-                              return ListTile(
+                      company!.destinations.isNotEmpty
+                          ? ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: company.destinations.length,
+                              separatorBuilder:
+                                  (BuildContext context, int index) =>
+                                      const Divider(),
+                              itemBuilder: (context, index) => ListTile(
                                 leading: const CircleAvatar(
-                                  child: Icon(Icons.directions_bus_sharp),
+                                  child: Icon(Icons.location_on),
                                 ),
-                                title: Text(bus.licence.toUpperCase()),
-                                subtitle: Text(
-                                    "${bus.model} (${bus.capacity}) Seater / ${bus.make}"),
-                                trailing: Text(" ${bus.year}"),
-                                onTap: () => showFleetDialog(bus,company.id),
-                              );
-                            },
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 200,
-                              width: 200,
-                              color: Colors.grey.shade200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: FilledButton(
-                                        style: FilledButton.styleFrom(
-                                            backgroundColor: Colors.green),
-                                        onPressed: () => showFleetDialog(null,company.id),
-                                        child: const Text("Add Bus"),
+                                title: Text(
+                                  company.destinations[index]
+                                      .toString()
+                                      .toUpperCase(),
+                                ),
+                                onTap: () => showRouteDialog(company.id,
+                                    destination: company.destinations[index]),
+                              ),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: 200,
+                                width: 200,
+                                color: Colors.grey.shade200,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: FilledButton(
+                                          style: FilledButton.styleFrom(
+                                              backgroundColor: Colors.green),
+                                          onPressed: () =>
+                                              showRouteDialog(company.id),
+                                          child: const Text("Add Route"),
+                                        ),
                                       ),
-                                    ),
-                                    const Text(
-                                      "No Buses. Please add a New Bus",
-                                    ),
-                                  ],
+                                      const Text(
+                                        "No Destinations. Please add a New Route",
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                  ],
+                      const Divider(),
+                      ListTile(
+                        title: const Text("Bus Fleet"),
+                        subtitle: const Text("Create and manage bus fleet"),
+                        trailing: FilledButton(
+                          onPressed: () => showFleetDialog(null, company.id),
+                          child: const Text("New Bus"),
+                        ),
+                      ),
+                      company.fleet.isNotEmpty
+                          ? ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: company.fleet.length,
+                              itemBuilder: (context, index) {
+                                var bus = company.fleet[index];
+                                return ListTile(
+                                  leading: const CircleAvatar(
+                                    child: Icon(Icons.directions_bus_sharp),
+                                  ),
+                                  title: Text(bus.licence.toUpperCase()),
+                                  subtitle: Text(
+                                      "${bus.model} (${bus.capacity}) Seater / ${bus.make}"),
+                                  trailing: Text(" ${bus.year}"),
+                                  onTap: () => showFleetDialog(bus, company.id),
+                                );
+                              },
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                height: 200,
+                                width: 200,
+                                color: Colors.grey.shade200,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: FilledButton(
+                                          style: FilledButton.styleFrom(
+                                              backgroundColor: Colors.green),
+                                          onPressed: () =>
+                                              showFleetDialog(null, company.id),
+                                          child: const Text("Add Bus"),
+                                        ),
+                                      ),
+                                      const Text(
+                                        "No Buses. Please add a New Bus",
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                    ],
+                  ),
                 );
               },
               error: (error, strace) {

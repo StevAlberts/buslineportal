@@ -33,21 +33,22 @@ class DatabaseService {
     await employeeRef.update(employee.toJson());
   }
 
-  Future<void> acceptEmployeeRequest(
+  Future<String?> acceptEmployeeRequest(
     String employeeId,
     String deviceId,
     String deviceName,
     BuildContext context,
   ) async {
+    String? error;
     final employeeRef = employeeCollection.doc(employeeId);
     await employeeRef.update({
       "deviceId": deviceId,
       "deviceName": deviceName,
-    }).onError((FirebaseException error, stackTrace) {
-      print(error);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("${error.message}")));
+    }).onError((FirebaseException error0, stackTrace) {
+      error = "Failed. User doesn't exist.";
     });
+    print(error);
+    return error;
   }
 
   Future<void> removeEmployeeRequest(String companyId, Map data) async {

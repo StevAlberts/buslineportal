@@ -12,12 +12,15 @@ import '../../../shared/utils/dynamic_padding.dart';
 
 class AuthView extends ConsumerWidget {
   AuthView({Key? key}) : super(key: key);
+  static String get routeName => 'login';
+  static String get routeLocation => '/$routeName';
   final _formKey = GlobalKey<FormBuilderState>();
 
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final authNotifier = ref.read(authProvider.notifier);
 
     final isLoading = ref.watch(loadingProvider);
@@ -46,7 +49,10 @@ class AuthView extends ConsumerWidget {
           error.state = errorMsg ?? "";
 
           if (errorCode == null) {
+
+            /// TODO: push replacement
             context.pushReplacement('/');
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 duration: Duration(seconds: 3),

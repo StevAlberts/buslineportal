@@ -3,9 +3,9 @@
     "short_name": "Busline Portal",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "Busline Go Portal.",
+    "background_color": "#ffffff",
+    "theme_color": "#ffffff",
+    "description": "Busline Go Portal",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

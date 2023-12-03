@@ -1,41 +1,37 @@
 import 'dart:typed_data';
 
+import 'package:buslineportal/shared/models/staff_details_model.dart';
+import 'package:buslineportal/shared/utils/date_format_utils.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-Future<Uint8List> generateInvoice(
-  PdfPageFormat pageFormat,
-) async {
-  final lorem = pw.LoremText();
+import '../../shared/models/luggage_ticket_model.dart';
+import '../../shared/models/passenger_ticket_model.dart';
+import '../../shared/models/trip_model.dart';
 
-  final products = <Product>[
-    Product('19874', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
-    Product('98452', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
-    Product('28375', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
-    Product('95673', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
-    Product('23763', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-    Product('55209', lorem.sentence(3), 23, "Kampala", "Lira", 20000),
-    Product('09853', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
-    Product('23463', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-    Product('56783', lorem.sentence(1), 23, "Kampala", "Lira", 20000),
-    Product('78256', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-    Product('23745', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-    Product('07834', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-    Product('23547', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-    Product('98387', lorem.sentence(2), 23, "Kampala", "Lira", 20000),
-  ];
+Future<Uint8List> generateInvoice({
+  required PdfPageFormat pageFormat,
+  required List<PassengerTicket> passengers,
+  required List<LuggageTicket> luggage,
+  required Trip trip,
+}) async {
+  var passengers0 = passengers
+      .map((e) =>
+          Passenger(e.id, e.names, e.seatNo, e.fromDest, e.toDest, e.fare))
+      .toList();
+
+  var luggage0 = luggage
+      .map((e) =>
+          Luggage(e.id, e.description, e.receiverNames, e.toDest, e.fare))
+      .toList();
 
   final invoice = Invoice(
-    invoiceNumber: '982347',
-    products: products,
-    customerName: 'Abraham Swearegin',
-    customerAddress: '54 rue de Rivoli\n75001 Paris, France',
-    paymentInfo:
-        '4509 Wiseman Street\nKnoxville, Tennessee(TN), 37929\n865-372-0425',
-    tax: .15,
+    passengers: passengers0,
+    luggage: luggage0,
+    trip: trip,
     baseColor: PdfColors.green,
     accentColor: PdfColors.blueGrey900,
   );
@@ -45,22 +41,16 @@ Future<Uint8List> generateInvoice(
 
 class Invoice {
   Invoice({
-    required this.products,
-    required this.customerName,
-    required this.customerAddress,
-    required this.invoiceNumber,
-    required this.tax,
-    required this.paymentInfo,
+    required this.passengers,
+    required this.luggage,
+    required this.trip,
     required this.baseColor,
     required this.accentColor,
   });
 
-  final List<Product> products;
-  final String customerName;
-  final String customerAddress;
-  final String invoiceNumber;
-  final double tax;
-  final String paymentInfo;
+  final List<Passenger> passengers;
+  final List<Luggage> luggage;
+  final Trip trip;
   final PdfColor baseColor;
   final PdfColor accentColor;
 
@@ -189,7 +179,7 @@ class Invoice {
                     children: [
                       pw.Center(
                         child: pw.Text(
-                          'COMPANY NAME',
+                          trip.companyDetails.name.toUpperCase(),
                           style: pw.TextStyle(
                             // color: baseColor,
                             fontWeight: pw.FontWeight.bold,
@@ -198,19 +188,19 @@ class Invoice {
                         ),
                       ),
                       pw.Text(
-                        'Company Address',
+                        trip.companyDetails.email,
                         style: const pw.TextStyle(
                           fontSize: 14,
                         ),
                       ),
                       pw.Text(
-                        'Company Phone number',
+                        trip.companyDetails.contact,
                         style: const pw.TextStyle(
                           fontSize: 14,
                         ),
                       ),
                       pw.Text(
-                        'UAB 123 C',
+                        trip.bus.licence.toUpperCase(),
                         style: pw.TextStyle(
                             fontSize: 14, fontWeight: pw.FontWeight.bold),
                       ),
@@ -250,8 +240,16 @@ class Invoice {
                         pw.Row(
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
+                            pw.Text('ID:'),
+                            pw.Text(trip.id.toUpperCase()),
+                          ],
+                        ),
+                        pw.SizedBox(height: 5),
+                        pw.Row(
+                          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                          children: [
                             pw.Text('From:'),
-                            pw.Text('KAMPALA'),
+                            pw.Text(trip.startDest.toUpperCase()),
                           ],
                         ),
                         pw.SizedBox(height: 5),
@@ -259,7 +257,7 @@ class Invoice {
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text('To:'),
-                            pw.Text('LIRA'),
+                            pw.Text(trip.endDest.toUpperCase()),
                           ],
                         ),
                         pw.SizedBox(height: 5),
@@ -267,7 +265,7 @@ class Invoice {
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text('Fare:'),
-                            pw.Text('20000'),
+                            pw.Text('${trip.fare}'),
                           ],
                         ),
                         pw.SizedBox(height: 5),
@@ -275,7 +273,7 @@ class Invoice {
                           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                           children: [
                             pw.Text('Travel Date:'),
-                            pw.Text('Fri 13-11-23 @ 7:00 PM'),
+                            pw.Text(travelDateFormat(trip.travelDate)),
                           ],
                         ),
                       ],
@@ -297,7 +295,7 @@ class Invoice {
                     pw.Container(
                       margin: const pw.EdgeInsets.only(bottom: 4),
                       child: pw.Text(
-                        'Fare Summary:',
+                        'Fare Breakdown:',
                         style: pw.TextStyle(
                             color: baseColor,
                             fontWeight: pw.FontWeight.bold,
@@ -307,16 +305,18 @@ class Invoice {
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text('Passengers:'),
-                        pw.Text('UGX 1,200,000'),
+                        pw.Text('Passengers (${passengers.length}):'),
+                        pw.Text(NumberFormat("#,###")
+                            .format(calculatePassengerFare(passengers))),
                       ],
                     ),
                     pw.SizedBox(height: 5),
                     pw.Row(
                       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                       children: [
-                        pw.Text('Luggage:'),
-                        pw.Text('UGX 2,150,000'),
+                        pw.Text('Luggage (${luggage.length}):'),
+                        pw.Text(NumberFormat("#,###")
+                            .format(calculateLuggageFare(luggage))),
                       ],
                     ),
                     pw.Divider(color: accentColor),
@@ -330,7 +330,8 @@ class Invoice {
                         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                         children: [
                           pw.Text('Total:'),
-                          pw.Text('3,350,000'),
+                          pw.Text(
+                              'UGX ${NumberFormat("#,###").format(calculateTotalFare(passengers, luggage))}'),
                         ],
                       ),
                     ),
@@ -347,11 +348,13 @@ class Invoice {
   pw.Widget _contentFooter(pw.Context context) {
     return pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
+      mainAxisAlignment: pw.MainAxisAlignment.start,
       children: [
         pw.Expanded(
           flex: 2,
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
+            mainAxisAlignment: pw.MainAxisAlignment.start,
             children: [
               pw.Container(
                 margin: const pw.EdgeInsets.only(top: 20, bottom: 8),
@@ -363,16 +366,22 @@ class Invoice {
                   ),
                 ),
               ),
-              pw.ListView.builder(
-                itemCount: 5,
-                itemBuilder: (_, index) {
-                  return pw.Padding(
-                      padding: const pw.EdgeInsets.only(bottom: 8),
-                      child: pw.Text(
-                        "Staff Names 12345$index (ROLE)",
-                      ));
-                },
-              ),
+              trip.staffDone!.isNotEmpty
+                  ? pw.ListView.builder(
+                      itemCount: trip.staffDone!.length,
+                      itemBuilder: (_, index) {
+                        var staff = trip.staffDone![index];
+                        return pw.Padding(
+                          padding: const pw.EdgeInsets.only(bottom: 8),
+                          child: pw.Text(
+                            "${staff.firstName} ${staff.lastName} - (${staff.role?.toUpperCase()}) - ${staff.staffId}",
+                          ),
+                        );
+                      },
+                    )
+                  : pw.Text(
+                      'No staff completed their activity.'
+                    ),
             ],
           ),
         ),
@@ -470,10 +479,10 @@ class Invoice {
         (col) => tableHeaders[col],
       ),
       data: List<List<String>>.generate(
-        products.length,
+        passengers.length,
         (row) => List<String>.generate(
           tableHeaders.length,
-          (col) => products[row].getIndex(col),
+          (col) => passengers[row].getIndex(col),
         ),
       ),
     );
@@ -482,7 +491,7 @@ class Invoice {
   pw.Widget _contentLuggageTable(pw.Context context) {
     const tableHeaders = [
       'Ticket #',
-      'Luggage Description',
+      'Description',
       'Receiver',
       'Destination',
       'Fare'
@@ -502,7 +511,7 @@ class Invoice {
         1: pw.Alignment.centerLeft,
         2: pw.Alignment.centerRight,
         3: pw.Alignment.center,
-        4: pw.Alignment.centerRight,
+        4: pw.Alignment.center,
       },
       headerStyle: pw.TextStyle(
         color: _baseTextColor,
@@ -526,57 +535,127 @@ class Invoice {
         (col) => tableHeaders[col],
       ),
       data: List<List<String>>.generate(
-        products.length,
+        luggage.length,
         (row) => List<String>.generate(
           tableHeaders.length,
-          (col) => products[row].getIndex(col),
+          (col) => luggage[row].getIndex(col),
         ),
       ),
     );
   }
 }
 
-String _formatCurrency(double amount) {
-  return '\$${amount.toStringAsFixed(2)}';
-}
-
-String _formatDate(DateTime date) {
-  final format = DateFormat.yMMMd('en_US');
-  return format.format(date);
-}
-
-class Product {
-  const Product(
-    this.sku,
+class Passenger {
+  const Passenger(
+    this.ticketNo,
     this.passengerNames,
     this.seatNo,
-    this.toDest,
     this.fromDest,
-    this.total,
+    this.toDest,
+    this.fare,
   );
 
-  final String sku;
+  final String ticketNo;
   final String passengerNames;
-  final int seatNo;
+  final String seatNo;
   final String fromDest;
   final String toDest;
-  final int total;
+  final int fare;
 
   String getIndex(int index) {
     switch (index) {
       case 0:
-        return sku;
+        return ticketNo;
       case 1:
         return passengerNames;
       case 2:
         return seatNo.toString();
       case 3:
-        return fromDest.toString();
+        return fromDest.toUpperCase();
       case 4:
-        return toDest.toString();
+        return toDest.toUpperCase();
       case 5:
-        return total.toString();
+        return NumberFormat("#,###").format(fare);
     }
     return '';
   }
+}
+
+class Luggage {
+  const Luggage(
+    this.ticketNo,
+    this.description,
+    this.receiver,
+    this.toDest,
+    this.fare,
+  );
+
+  final String ticketNo;
+  final String description;
+  final String receiver;
+  final String toDest;
+  final int fare;
+
+  String getIndex(int index) {
+    switch (index) {
+      case 0:
+        return ticketNo;
+      case 1:
+        return description;
+      case 2:
+        return receiver.toUpperCase();
+      case 3:
+        return toDest.toUpperCase();
+      case 4:
+        return NumberFormat("#,###").format(fare);
+    }
+    return '';
+  }
+}
+
+class Staff {
+  const Staff(
+    this.id,
+    this.names,
+    this.role,
+  );
+
+  final String id;
+  final String names;
+  final String role;
+
+  String getIndex(int index) {
+    switch (index) {
+      case 0:
+        return id;
+      case 1:
+        return names;
+      case 2:
+        return role.toUpperCase();
+    }
+    return '';
+  }
+}
+
+double calculatePassengerFare(List<Passenger> passengers) {
+  double totalFare = 0;
+  for (final passenger in passengers) {
+    totalFare += passenger.fare;
+  }
+  return totalFare;
+}
+
+double calculateLuggageFare(List<Luggage> luggage) {
+  double totalFare = 0;
+  for (final luggage in luggage) {
+    totalFare += luggage.fare;
+  }
+  return totalFare;
+}
+
+double calculateTotalFare(List<Passenger> passengers, List<Luggage> luggage) {
+  var pass = calculatePassengerFare(passengers);
+  var lugg = calculateLuggageFare(luggage);
+  var total = pass + lugg;
+  return total;
 }

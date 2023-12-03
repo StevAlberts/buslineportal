@@ -22,7 +22,6 @@ class OnboardCompanyProfile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var firebaseUser = FirebaseAuth.instance.currentUser;
-    final authNotifier = ref.read(authProvider.notifier);
 
     final userRepository = FirebaseFirestore.instance
         .collection('requests')

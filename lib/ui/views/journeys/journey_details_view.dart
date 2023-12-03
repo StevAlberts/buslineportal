@@ -1,3 +1,4 @@
+import 'package:buslineportal/network/services/database_services.dart';
 import 'package:buslineportal/shared/utils/app_color_utils.dart';
 import 'package:buslineportal/shared/utils/app_strings_utils.dart';
 import 'package:buslineportal/shared/utils/date_format_utils.dart';
@@ -10,6 +11,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/models/trip_model.dart';
 import '../../../shared/utils/dynamic_padding.dart';
+import '../reports/report_view.dart';
 
 class JourneyDetailsView extends StatelessWidget {
   const JourneyDetailsView({Key? key, required this.trip}) : super(key: key);
@@ -24,9 +26,7 @@ class JourneyDetailsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text(trip != null
-            ? "Trip ${trip?.id.toUpperCase()}"
-            : ""),
+        title: Text(trip != null ? "Trip ${trip?.id.toUpperCase()}" : ""),
       ),
       body: trip != null
           ? ListView(
@@ -237,12 +237,40 @@ class JourneyDetailsView extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: FilledButton.icon(
                             style: FilledButton.styleFrom(
-                                backgroundColor: Colors.green),
+                                backgroundColor:
+                                    trip!.isEnded ? Colors.green : Colors.grey),
                             icon: const Icon(Icons.print),
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Coming soon...")),
-                              );
+                            onPressed: () async {
+                              var isDone = trip?.isEnded ?? false;
+
+                              if (isDone) {
+                                var passengers = await databaseService
+                                    .getPassengerTickets(trip!.id);
+                                var luggage = await databaseService
+                                    .getLuggageTickets(trip!.id);
+
+                                // Check if widget is mounted before navigating
+                                if (context.mounted) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ReportView(
+                                        passengers: passengers,
+                                        luggage: luggage,
+                                        trip: trip!,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Reports only generated when trip ends.",
+                                    ),
+                                  ),
+                                );
+                              }
                             },
                             label: const Text("Generate"),
                           ),

@@ -22,12 +22,12 @@ void main() async {
 
   // Both of the following lines are good for testing,
   // but can be removed for release builds
-  if (!kDebugMode) {
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    await auth.setPersistence(Persistence.LOCAL);
-    //   // FirebaseAuth.instance.signOut();
-  }
+  // if (kDebugMode) {
+  //   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //   await auth.setPersistence(Persistence.LOCAL);
+  //   //   // FirebaseAuth.instance.signOut();
+  // }
 
   // use path for web
   usePathUrlStrategy();
@@ -40,9 +40,8 @@ class MyApp extends ConsumerWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final firebaseUser = ref.watch(firebaseUserProvider);
 
-    final authNotifier = AuthNotifier();
+    final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
       title: 'Busline Portal',
@@ -62,29 +61,9 @@ class MyApp extends ConsumerWidget {
           brightness: Brightness.light,
         ),
       ),
-      // routerConfig: appRouterConfig(firebaseUser),
-      routerConfig: firebaseUser.when(
-        data: (user) {
-          print("Notify: ${authNotifier.value}");
-          return appRouterConfig(user);
-        },
-        error: (error, stack) {
-          print(error);
-          return appRouterConfig(null);
-        },
-        loading: () => appRouterConfig(null),
-      ),
-
+      routeInformationParser: router.routeInformationParser,
+      routerDelegate: router.routerDelegate,
+      routeInformationProvider: router.routeInformationProvider,
     );
-  }
-}
-
-final auth = FirebaseAuth.instance;
-
-class AuthNotifier extends ValueNotifier<bool> {
-  AuthNotifier() : super(false) {
-    auth.authStateChanges().listen((user) {
-      value = user != null;
-    });
   }
 }

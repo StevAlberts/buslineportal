@@ -1,42 +1,45 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
+// Usually, stream-based redirects is more than enough.
+// Most of the auth-related logic is handled by the SDK
 final firebaseUserProvider = StreamProvider<User?>(
   (ref) => FirebaseAuth.instance.authStateChanges(),
 );
 
-final authProvider = StateNotifierProvider<Auth, User?>(
-  (ref) => Auth(),
-  name: 'authProvider',
-);
+final authProvider = ChangeNotifierProvider<Auth>((ref) {
+  final auth = Auth();
+  auth.init();
+  return auth;
+});
 
-// class FirebaseErrors {
-//   static void showError(BuildContext context, FirebaseAuthException error) {
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(
-//         content: Text(error.message!),
-//       ),
-//     );
-//   }
-// }
 
-class Auth extends StateNotifier<User?> {
-  Auth() : super(null);
+class Auth extends ChangeNotifier {
 
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  User? _user;
+  bool get isAuthenticated => _user != null;
 
+  // listen to user changes
+  Future<void> init() async {
+    _firebaseAuth.authStateChanges().listen((User? user) {
+      _user = user;
+      notifyListeners();
+    });
+  }
+
+  // login user
   Future<Map<User?, String>> login(String email, String password) async {
     try {
       final credentials = await _firebaseAuth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      state = credentials.user;
-
-      return {state: ""};
+      _user = credentials.user;
+      return {_user: ""};
     } on FirebaseAuthException catch (e) {
-      return {state: "${e.message}"};
+      return {_user: "${e.message}"};
     }
   }
 
@@ -46,11 +49,9 @@ class Auth extends StateNotifier<User?> {
         email: email,
         password: password,
       );
-
-      state = credentials.user;
-
+      _user = credentials.user;
       return {
-        "user": state,
+        "user": _user,
         "error": null,
       };
     } on FirebaseAuthException catch (e) {
@@ -70,7 +71,7 @@ class Auth extends StateNotifier<User?> {
           codeAutoRetrievalTimeout: (timeout) {});
 
       return {
-        "user": state,
+        "user": _user,
         "error": null,
       };
     } on FirebaseAuthException catch (e) {
@@ -93,7 +94,8 @@ class Auth extends StateNotifier<User?> {
 
   Future<bool> logout() async {
     await _firebaseAuth.signOut();
-    state = null;
+    _user = null;
+    notifyListeners();
     return true;
   }
 }

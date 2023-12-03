@@ -6,7 +6,7 @@ part of 'trips_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$streamAllTripsHash() => r'5508c20661fdb9a4d3202c02ae3448cc388bbe19';
+String _$streamAllTripsHash() => r'0aa9b3262f9e1ae4ee197a88adcac821faaa1a7b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -284,7 +284,7 @@ class _StreamTripProviderElement extends AutoDisposeStreamProviderElement<Trip>
   String get companyId => (origin as StreamTripProvider).companyId;
 }
 
-String _$streamMovingTripsHash() => r'bf5feb7851703dc545303b39d3362cf3c6b872e1';
+String _$streamMovingTripsHash() => r'4048a1c29d11bf77c64dfc4f7f7fb3a24eade1aa';
 
 /// See also [streamMovingTrips].
 @ProviderFor(streamMovingTrips)

@@ -45,3 +45,19 @@ Stream<UserModel?> streamCurrentUser(
 
   return const Stream.empty();
 }
+
+@riverpod
+Stream<List<UserModel>?> streamUserManagers(
+  StreamUserManagersRef ref,
+  String companyId,
+) {
+  final collection = FirebaseFirestore.instance.collection('users');
+
+  var userStream = collection
+      .where('companyId', isEqualTo: companyId)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList());
+
+  return userStream;
+}

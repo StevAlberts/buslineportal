@@ -1,19 +1,25 @@
 import 'package:buslineportal/network/services/authentication_service.dart';
+import 'package:buslineportal/network/services/database_services.dart';
 import 'package:buslineportal/shared/models/company_model.dart';
 import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:buslineportal/shared/models/user_model.dart';
+import 'package:buslineportal/shared/providers/users/user_provider.dart';
+import 'package:buslineportal/ui/widgets/error_view.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:colorize_text_avatar/colorize_text_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:otp/otp.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
+import '../../../shared/providers/auth/auth_provider.dart';
 import '../../../shared/utils/app_color_utils.dart';
 import '../../../shared/utils/dynamic_padding.dart';
 
-class ProfileView extends StatefulWidget {
+class ProfileView extends ConsumerStatefulWidget {
   const ProfileView({Key? key, required this.company, required this.user})
       : super(key: key);
 
@@ -21,14 +27,16 @@ class ProfileView extends StatefulWidget {
   final UserModel user;
 
   @override
-  State<ProfileView> createState() => _ProfileViewState();
+  ConsumerState<ProfileView> createState() => _ProfileViewState();
 }
 
-class _ProfileViewState extends State<ProfileView> {
+class _ProfileViewState extends ConsumerState<ProfileView> {
   final pageCreateIndexNotifier = ValueNotifier(0);
   final _formKey = GlobalKey<FormBuilderState>();
 
   Future<void> logoutDialog() {
+    final authNotifier = ref.read(authProvider.notifier);
+
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -42,7 +50,7 @@ class _ProfileViewState extends State<ProfileView> {
           title: const Text('Do you want logout?'),
           actions: <Widget>[
             TextButton(
-              child: const Text('CANCEL'),
+              child: const Text('CANCEL'), // 07
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
@@ -52,8 +60,7 @@ class _ProfileViewState extends State<ProfileView> {
               child: const Text('OK'),
               onPressed: () {
                 // Log user out
-                // authNotifier.logout();
-                authenticationService.logout();
+                authNotifier.logout();
               },
             ),
           ],
@@ -186,26 +193,23 @@ class _ProfileViewState extends State<ProfileView> {
                       var email = _formKey.currentState?.instantValue["email"];
                       var role = 'manager';
 
-                      var employee0 = Staff(
-                        id: employeeId,
-                        companyId: "$companyId",
-                        firstName: firstName,
-                        lastName: lastName,
-                        gender: gender,
-                        companyName: widget.company.name,
-                        phone: 'null',
-                        email: email,
-                        role: role,
-                        isOnline: false,
-                        trips: [],
-                      );
-
                       // send employee invite
                       authenticationService
                           .sendInviteWithEmailLink(employeeId, email)
                           .then((value) {
-                        /// TODO: Save staff details to userDB
-                        print(employee0.toJson());
+                        /// Save staff details to userDB
+                        var staffData = {
+                          "id": employeeId,
+                          "email": email,
+                          "firstName": firstName,
+                          "lastName": lastName,
+                          "gender": gender,
+                          "role": role,
+                          "emailLink": value,
+                          "companyId": widget.user.companyId,
+                          "timestamp": Timestamp.now(),
+                        };
+                        databaseService.saveEmployeeInvite(staffData);
                       });
 
                       // show success
@@ -241,6 +245,9 @@ class _ProfileViewState extends State<ProfileView> {
 
   @override
   Widget build(BuildContext context) {
+    final managerStream =
+        ref.watch(StreamUserManagersProvider(widget.user.companyId!));
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -326,77 +333,102 @@ class _ProfileViewState extends State<ProfileView> {
             subtitle: const Text("Roles and Permissions"),
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(Icons.manage_accounts),
-            title: const Text("Company Managers"),
-            subtitle: const Text("Create and invite account managers to the portal"),
-            trailing: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FilledButton.icon(
-                onPressed: () {
-                  WoltModalSheet.show<void>(
-                    pageIndexNotifier: pageCreateIndexNotifier,
-                    context: context,
-                    barrierDismissible: false,
-                    pageListBuilder: (modalSheetContext) {
-                      final textTheme = Theme.of(context).textTheme;
-                      return [
-                        // new staff
-                        updateManagerPage(
-                            modalSheetContext, textTheme, "compId"),
-                      ];
-                    },
-                    modalTypeBuilder: (context) {
-                      final size = MediaQuery.of(context).size.width;
-                      if (size < 400) {
-                        return WoltModalType.bottomSheet;
-                      } else {
-                        return WoltModalType.dialog;
-                      }
-                    },
-                    onModalDismissedWithBarrierTap: () {
-                      debugPrint('Closed modal sheet with barrier tap');
-                      Navigator.of(context).pop();
-                      pageCreateIndexNotifier.value = 0;
-                    },
-                    maxDialogWidth: 560,
-                    minDialogWidth: 400,
-                    minPageHeight: 0.0,
-                    maxPageHeight: 0.9,
-                  );
-                },
-                icon: const Icon(Icons.add),
-                label: const Text("Invite"),
-              ),
+          Visibility(
+            visible: widget.user.role == 'admin',
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.manage_accounts),
+                  title: const Text("Company Managers"),
+                  subtitle: const Text(
+                      "Create and invite account managers to the portal"),
+                  trailing: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        WoltModalSheet.show<void>(
+                          pageIndexNotifier: pageCreateIndexNotifier,
+                          context: context,
+                          barrierDismissible: false,
+                          pageListBuilder: (modalSheetContext) {
+                            final textTheme = Theme.of(context).textTheme;
+                            return [
+                              // new staff
+                              updateManagerPage(
+                                modalSheetContext,
+                                textTheme,
+                                widget.user.companyId,
+                              ),
+                            ];
+                          },
+                          modalTypeBuilder: (context) {
+                            final size = MediaQuery.of(context).size.width;
+                            if (size < 400) {
+                              return WoltModalType.bottomSheet;
+                            } else {
+                              return WoltModalType.dialog;
+                            }
+                          },
+                          onModalDismissedWithBarrierTap: () {
+                            debugPrint('Closed modal sheet with barrier tap');
+                            Navigator.of(context).pop();
+                            pageCreateIndexNotifier.value = 0;
+                          },
+                          maxDialogWidth: 560,
+                          minDialogWidth: 400,
+                          minPageHeight: 0.0,
+                          maxPageHeight: 0.9,
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text("Invite"),
+                    ),
+                  ),
+                ),
+                managerStream.when(
+                  data: (userManagers) {
+
+                    final filteredList = userManagers?.where((element) => element.uid != widget.user.uid).toList();
+
+                    return ListView.separated(
+                      itemCount: filteredList!.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        var manager = filteredList[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            child: TextAvatar(
+                              text: "${manager.firstName} ${manager.lastName}",
+                              shape: Shape.Circular,
+                              numberLetters: 2,
+                              upperCase: true,
+                            ),
+                          ),
+                          title:
+                              Text("${manager.firstName} ${manager.lastName}"),
+                          subtitle: Text("${manager.email}"),
+                          onTap: () {},
+                          trailing: Card(
+                            color: roleCardColor("${manager.role}"),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text("${manager.role?.toUpperCase()}"),
+                            ),
+                          ),
+                        );
+                      },
+                      separatorBuilder: (context, index) => const Divider(),
+                    );
+                  },
+                  error: (error, stack) {
+                    return ErrorView(error: error);
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                ),
+              ],
             ),
-          ),
-          ListView.separated(
-            itemCount: 0,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: CircleAvatar(
-                  child: TextAvatar(
-                    text: 'E N'.toUpperCase(),
-                    shape: Shape.Circular,
-                    numberLetters: 2,
-                    upperCase: true,
-                  ),
-                ),
-                title: const Text("{employee.firstName} {employee.lastName}"),
-                subtitle: const Text("ID {employee.id.toUpperCase()}"),
-                onTap: () {},
-                trailing: Card(
-                  color: roleCardColor("employee.role"),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text("employee.role.toUpperCase()"),
-                  ),
-                ),
-              );
-            },
-            separatorBuilder: (context, index) => const Divider(),
           ),
           const SizedBox(height: 20),
         ],

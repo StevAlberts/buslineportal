@@ -25,7 +25,9 @@ import '../../../shared/utils/date_format_utils.dart';
 import '../journeys/journey_details_view.dart';
 
 class DashboardView extends ConsumerWidget {
-  const DashboardView({Key? key}) : super(key: key);
+  const DashboardView({Key? key,required this.trips,}) : super(key: key);
+
+  final List<Trip> trips;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -118,21 +120,10 @@ class DashboardView extends ConsumerWidget {
                       child: Center(
                         child: Text(
                           "${company?.name.toUpperCase()}",
-                          style: Theme.of(context).textTheme.headlineLarge,
+                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(color: Colors.black),
                         ),
                       ),
                     ),
-                    // FilledButton(
-                    //   onPressed: () {
-                    //     Navigator.push(
-                    //       context,
-                    //       MaterialPageRoute(
-                    //         builder: (context) => const ReportView(),
-                    //       ),
-                    //     );
-                    //   },
-                    //   child: const Text("SEE PDF"),
-                    // ),
                     ListTile(
                       leading: const Icon(Icons.group),
                       title: const Text("Employees"),
@@ -164,7 +155,7 @@ class DashboardView extends ConsumerWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => JourneyView(company!),
+                              builder: (context) => JourneyView(company: company!,trips: trips,),
                             ),
                           );
                         },
@@ -424,7 +415,7 @@ class DashboardView extends ConsumerWidget {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               JourneyView(
-                                                                  company),
+                                                                  company:company,trips: trips,),
                                                         ),
                                                       );
                                                     },

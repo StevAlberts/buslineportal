@@ -1,3 +1,4 @@
+import 'package:buslineportal/ui/views/app_view.dart';
 import 'package:buslineportal/ui/views/dashboard/dashboard_view.dart';
 import 'package:buslineportal/ui/views/onboarding/onboarding_company_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -31,11 +32,8 @@ class AppIndex extends ConsumerWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final user = snapshot.data!.data();
-
               // check if account available
-              return user == null
-                  ?  OnboardCompanyProfile()
-                  : const DashboardView();
+              return user == null ? OnboardCompanyProfile() : const AppView();
             } else if (snapshot.hasError) {
               // Handle the error here.
               return Center(child: Text("${snapshot.error}"));

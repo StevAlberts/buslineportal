@@ -1,3 +1,7 @@
+import 'package:buslineportal/network/services/authentication_service.dart';
+import 'package:buslineportal/network/services/database_services.dart';
+import 'package:buslineportal/shared/models/user_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -6,7 +10,10 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/utils/dynamic_padding.dart';
 
 class InviteView extends StatelessWidget {
-  InviteView({Key? key}) : super(key: key);
+  InviteView({Key? key, required this.staffId}) : super(key: key);
+  static String get routeName => 'invite';
+  static String get routeLocation => '/$routeName';
+  final String? staffId;
 
   final _formKey = GlobalKey<FormBuilderState>();
 
@@ -49,6 +56,17 @@ class InviteView extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Create Manager Account",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w300),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                   FormBuilder(
                     key: _formKey,
                     child: Column(
@@ -56,10 +74,10 @@ class InviteView extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 40.0),
                           child: FormBuilderTextField(
-                            name: 'id',
+                            name: 'company',
                             decoration: const InputDecoration(
-                              labelText: 'ID Number',
-                              hintText: 'Enter your ID Number',
+                              labelText: 'Company ID',
+                              hintText: 'Enter your company ID',
                               icon: Icon(Icons.numbers),
                             ),
                             validator: FormBuilderValidators.compose([
@@ -140,21 +158,70 @@ class InviteView extends StatelessWidget {
                             onPressed: () {
                               if (_formKey.currentState?.saveAndValidate() ??
                                   false) {
-                                var id =
-                                    _formKey.currentState?.instantValue["id"];
+                                var company = _formKey
+                                    .currentState?.instantValue["company"];
                                 var email = _formKey
                                     .currentState?.instantValue["email"];
                                 var password = _formKey
                                     .currentState?.instantValue["password"];
 
-                                print("$id\n$email\n$password");
+                                print("$staffId\n$company\n$email\n$password");
 
-                                /// TODO: Complete link signup
-                                /// Then: Signup email and password
-                                ///
-                                /// Check company address and save details to company mgtRequest
-                                /// Create account for user.
-                                ///
+                                if (staffId != null) {
+                                  /// Complete link signup
+                                  databaseService
+                                      .checkEmployeeInvite(staffId!, email)
+                                      .then((staff) {
+                                    if (staff != null) {
+                                      authenticationService
+                                          .handleSignInLink(
+                                        id: staffId!,
+                                        newPassword: password,
+                                        emailAuth: staff["email"],
+                                      )
+                                          .then((user) {
+                                        if (user != null) {
+                                          var user0 = UserModel(
+                                            companyId: staff["companyId"],
+                                            uid: user.uid,
+                                            email: staff["email"],
+                                            emailVerified: false,
+                                            firstName: staff["firstName"],
+                                            lastName: staff["lastName"],
+                                            photoURL: null,
+                                            phoneNumber: staff["phone"],
+                                            timestamp: Timestamp.now(),
+                                            role: staff["role"],
+                                          );
+                                          // save user to user db
+                                          databaseService.saveUser(
+                                            user.uid,
+                                            user0,
+                                          );
+                                          // navigate to home
+                                          context.go('/');
+                                        }
+                                      });
+                                    } else {
+                                      // User doesnt exist
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "User doesnt exit. Please check your email."),
+                                        ),
+                                      );
+                                    }
+                                  });
+                                } else {
+                                  // User doesnt exist
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          "User doesnt exit. Please check your email."),
+                                    ),
+                                  );
+                                }
                               }
                             },
                             child: const Padding(

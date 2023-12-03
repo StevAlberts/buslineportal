@@ -27,9 +27,14 @@ import '../../../shared/utils/app_color_utils.dart';
 final allStaffProvider = StateProvider((ref) => <Staff>[]);
 
 class JourneyView extends ConsumerStatefulWidget {
-  const JourneyView(this.company, {Key? key}) : super(key: key);
+  const JourneyView({
+    Key? key,
+    required this.company,
+    required this.trips,
+  }) : super(key: key);
 
   final Company company;
+  final List<Trip> trips;
 
   @override
   ConsumerState<JourneyView> createState() => _JourneyViewState();
@@ -591,7 +596,7 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
             final company =
                 ref.watch(StreamCompanyProvider(compId)).valueOrNull;
 
-            final tripsStream = ref.watch(StreamAllTripsProvider(compId!));
+            // final tripsStream = ref.watch(StreamAllTripsProvider(compId!));
 
             return ListView(
               padding: const EdgeInsets.all(16.0),
@@ -610,126 +615,112 @@ class _JourneyViewState extends ConsumerState<JourneyView> {
                     ),
                   ),
                 ),
-                tripsStream.when(
-                  data: (trips) {
-                    print("Trips: ${trips.length}");
-                    return trips.isNotEmpty
-                        ? ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            separatorBuilder: (context, index) =>
-                                const Divider(height: 0),
-                            itemCount: trips.length,
-                            itemBuilder: (context, index) {
-                              Trip trip = trips[index];
-                              return Card(
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(10.0),
-                                  title: Text(
-                                    "${trip.startDest.toUpperCase()} - ${trip.endDest.toUpperCase()}",
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "ID ${trip.id.toUpperCase()}",
-                                      ),
-                                      Text(
-                                        travelDateFormat(trip.travelDate),
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodyMedium,
-                                      ),
-                                    ],
-                                  ),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        journeyStatusText(
-                                          trip.isStarted,
-                                          trip.isEnded,
-                                        ),
-                                        style: TextStyle(
-                                          color: journeyStatusColors(
-                                            trip.isStarted,
-                                            trip.isEnded,
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Icon(
-                                          Icons.circle,
-                                          size: 20,
-                                          color: journeyStatusColors(
-                                            trip.isStarted,
-                                            trip.isEnded,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  onTap: () {
-                                    // context.go("/journey_details/${trip.id}",
-                                    //     extra: trips);
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            JourneyDetailsView(trip: trip),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Container(
-                              height: 200,
-                              width: 300,
-                              color: Colors.grey.shade200,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: FilledButton(
-                                        style: FilledButton.styleFrom(
-                                            backgroundColor: Colors.green),
-                                        onPressed: () =>
-                                            showTripDialog(company!, null),
-                                        child: const Text("Schedule Trip"),
-                                      ),
-                                    ),
-                                    const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Text(
-                                        "No previous trips. Please click to add New Trip to create a Journey",
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                const SizedBox(height: 8),
+                widget.trips.isNotEmpty
+                    ? ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 0),
+                        itemCount:  widget.trips.length,
+                        itemBuilder: (context, index) {
+                          Trip trip =  widget.trips[index];
+                          return Card(
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(10.0),
+                              title: Text(
+                                "${trip.startDest.toUpperCase()} - ${trip.endDest.toUpperCase()}",
+                                style: Theme.of(context).textTheme.titleMedium,
                               ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "ID ${trip.id.toUpperCase()}",
+                                  ),
+                                  Text(
+                                    travelDateFormat(trip.travelDate),
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    journeyStatusText(
+                                      trip.isStarted,
+                                      trip.isEnded,
+                                    ),
+                                    style: TextStyle(
+                                      color: journeyStatusColors(
+                                        trip.isStarted,
+                                        trip.isEnded,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Icon(
+                                      Icons.circle,
+                                      size: 20,
+                                      color: journeyStatusColors(
+                                        trip.isStarted,
+                                        trip.isEnded,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              onTap: () {
+                                // context.go("/journey_details/${trip.id}",
+                                //     extra: trips);
+
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        JourneyDetailsView(trip: trip),
+                                  ),
+                                );
+                              },
                             ),
                           );
-                  },
-                  error: (error, stack) {
-                    debugPrint("$error");
-                    return Center(child: Text("$error"));
-                  },
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
+                        },
+                      )
+                    : Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          height: 200,
+                          width: 300,
+                          color: Colors.grey.shade200,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FilledButton(
+                                    style: FilledButton.styleFrom(
+                                        backgroundColor: Colors.green),
+                                    onPressed: () =>
+                                        showTripDialog(company!, null),
+                                    child: const Text("Schedule Trip"),
+                                  ),
+                                ),
+                                const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "No previous trips. Please click to add New Trip to create a Journey",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
               ],
             );
           });

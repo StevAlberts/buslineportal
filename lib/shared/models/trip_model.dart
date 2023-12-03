@@ -29,6 +29,8 @@ class Trip {
   DateTime? departure;
   DateTime? arrival;
 
+  List<StaffDetail>? staffDone;
+
   Trip({
     required this.id,
     required this.companyId,
@@ -44,6 +46,7 @@ class Trip {
     required this.departure,
     required this.arrival,
     required this.travelDate,
+    this.staffDone,
   });
 
   factory Trip.fromJson(Map<String, dynamic> json) => Trip(
@@ -67,6 +70,10 @@ class Trip {
         departure: json["departure"]?.toDate(),
         arrival: json["arrival"]?.toDate(),
         travelDate: json["travelDate"].toDate(),
+        staffDone: json["staffDone"] != null
+            ? List<StaffDetail>.from(
+                json["staffDone"].map((x) => StaffDetail.fromJson(x)))
+            : [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -75,6 +82,7 @@ class Trip {
         "companyDetails": companyDetails.toJson(),
         "bus": bus.toJson(),
         "staff": List<dynamic>.from(staffDetails.map((x) => x.toJson())),
+        "staffDone": List<dynamic>.from(staffDetails.map((x) => x.toJson())),
         "passengers":
             List<dynamic>.from(passengers.map((data) => data.toJson())),
         "startDest": startDest,

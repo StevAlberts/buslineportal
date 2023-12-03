@@ -15,12 +15,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scaffold_responsive/scaffold_responsive.dart';
 
 import '../../shared/providers/company/company_provider.dart';
+import '../../shared/providers/trips/trips_provider.dart';
 import '../../shared/providers/users/user_provider.dart';
 import 'employees/employee_view.dart';
 import 'journeys/journey_view.dart';
 
 class AppView extends ConsumerStatefulWidget {
   const AppView({Key? key}) : super(key: key);
+  static String get routeName => '/';
+  static String get routeLocation => '/';
 
   @override
   ConsumerState<AppView> createState() => _AppViewState();
@@ -47,149 +50,163 @@ class _AppViewState extends ConsumerState<AppView> {
         return Consumer(builder: (context, ref, child) {
           final companyStream =
               ref.watch(StreamCompanyProvider(user!.companyId));
-
           return companyStream.when(
             data: (snapshot) {
-              return ResponsiveScaffold(
-                menuController: menuController,
-                appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(Icons.menu),
-                    onPressed: menuController.toggle,
-                  ),
-                  title: const Text("Busline Portal"),
-                  centerTitle: false,
-                ),
-                body: Center(
-                  child: [
-                    const DashboardView(),
-                    JourneyView(snapshot!),
-                    EmployeeView(company: snapshot),
-                    const InventoriesView(),
-                    const JobsView(),
-                    ProfileView(
-                      company: snapshot,
-                      user: user,
-                    ),
-                    // const SettingsView(),
-                    // CreateProfileView(),
-                  ].elementAt(_selectedIndex),
-                ),
-                menu: Drawer(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      DrawerHeader(
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
+              return Consumer(builder: (context, ref, child) {
+                final tripsStream =
+                    ref.watch(StreamAllTripsProvider(snapshot!.id));
+
+                return tripsStream.when(
+                  data: (trips) {
+                    return ResponsiveScaffold(
+                      menuController: menuController,
+                      appBar: AppBar(
+                        leading: IconButton(
+                          icon: const Icon(Icons.menu),
+                          onPressed: menuController.toggle,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: CircleAvatar(
-                                  radius: 30,
-                                  child: TextAvatar(
-                                    text: '${user.firstName} ${user.lastName}'
-                                        .toUpperCase(),
-                                    shape: Shape.Circular,
-                                    numberLetters: 2,
-                                    upperCase: true,
-                                    size: 70,
-                                    fontSize: 30,
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '${user.firstName} ${user.lastName}',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(color: Colors.white),
-                                ),
-                              ),
-                            ],
+                        title: const Text("Busline Portal"),
+                        centerTitle: false,
+                      ),
+                      body: Center(
+                        child: [
+                          DashboardView(trips: trips),
+                          JourneyView(company: snapshot, trips: trips),
+                          EmployeeView(company: snapshot),
+                          const InventoriesView(),
+                          const JobsView(),
+                          ProfileView(
+                            company: snapshot,
+                            user: user,
                           ),
+                          // const SettingsView(),
+                          // CreateProfileView(),
+                        ].elementAt(_selectedIndex),
+                      ),
+                      menu: Drawer(
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            DrawerHeader(
+                              decoration: const BoxDecoration(
+                                color: Colors.blue,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: CircleAvatar(
+                                        radius: 30,
+                                        child: TextAvatar(
+                                          text:
+                                              '${user.firstName} ${user.lastName}'
+                                                  .toUpperCase(),
+                                          shape: Shape.Circular,
+                                          numberLetters: 2,
+                                          upperCase: true,
+                                          size: 70,
+                                          fontSize: 30,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        '${user.firstName} ${user.lastName}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleLarge!
+                                            .copyWith(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ListTile(
+                              title: const Text('Dashboard'),
+                              leading: const Icon(Icons.dashboard),
+                              selected: _selectedIndex == 0,
+                              onTap: () {
+                                // Update the state of the app
+                                _onItemTapped(0);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('Trips'),
+                              leading: const Icon(Icons.location_on),
+                              selected: _selectedIndex == 1,
+                              onTap: () {
+                                // Update the state of the app
+                                _onItemTapped(1);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text('Staff'),
+                              leading: const Icon(Icons.people_alt_outlined),
+                              selected: _selectedIndex == 2,
+                              onTap: () {
+                                // Update the state of the app
+                                _onItemTapped(2);
+                              },
+                            ),
+                            ListTile(
+                              title: const Text("Inventories"),
+                              leading: const Icon(Icons.directions_bus),
+                              selected: _selectedIndex == 3,
+                              onTap: () {
+                                // Update the state of the app
+                                _onItemTapped(3);
+                              },
+                            ),
+                            // ExpansionTile(
+                            //   title: const Text("Inventory"),
+                            //   leading: const Icon(Icons.directions_bus),
+                            //   childrenPadding: const EdgeInsets.only(left: 10.0),
+                            //   children: [
+                            //     ListTile(
+                            //       title: const Text('Routes'),
+                            //       leading: const SizedBox(),
+                            //       selected: _selectedIndex == 3,
+                            //       onTap: () {
+                            //         // Update the state of the app
+                            //         _onItemTapped(3);
+                            //       },
+                            //     ),
+                            //     ListTile(
+                            //       title: const Text('Fleet'),
+                            //       leading: const SizedBox(),
+                            //       selected: _selectedIndex == 4,
+                            //       onTap: () {
+                            //         // Update the state of the app
+                            //         _onItemTapped(4);
+                            //       },
+                            //     ),
+                            //   ],
+                            // ),
+                            ListTile(
+                              title: const Text('Account'),
+                              leading: const Icon(Icons.account_circle_rounded),
+                              selected: _selectedIndex == 5,
+                              onTap: () {
+                                // Update the state of the app
+                                _onItemTapped(5);
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      ListTile(
-                        title: const Text('Dashboard'),
-                        leading: const Icon(Icons.dashboard),
-                        selected: _selectedIndex == 0,
-                        onTap: () {
-                          // Update the state of the app
-                          _onItemTapped(0);
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Trips'),
-                        leading: const Icon(Icons.location_on),
-                        selected: _selectedIndex == 1,
-                        onTap: () {
-                          // Update the state of the app
-                          _onItemTapped(1);
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Staff'),
-                        leading: const Icon(Icons.people_alt_outlined),
-                        selected: _selectedIndex == 2,
-                        onTap: () {
-                          // Update the state of the app
-                          _onItemTapped(2);
-                        },
-                      ),
-                      ListTile(
-                        title: const Text("Inventories"),
-                        leading: const Icon(Icons.directions_bus),
-                        selected: _selectedIndex == 3,
-                        onTap: () {
-                          // Update the state of the app
-                          _onItemTapped(3);
-                        },
-                      ),
-                      // ExpansionTile(
-                      //   title: const Text("Inventory"),
-                      //   leading: const Icon(Icons.directions_bus),
-                      //   childrenPadding: const EdgeInsets.only(left: 10.0),
-                      //   children: [
-                      //     ListTile(
-                      //       title: const Text('Routes'),
-                      //       leading: const SizedBox(),
-                      //       selected: _selectedIndex == 3,
-                      //       onTap: () {
-                      //         // Update the state of the app
-                      //         _onItemTapped(3);
-                      //       },
-                      //     ),
-                      //     ListTile(
-                      //       title: const Text('Fleet'),
-                      //       leading: const SizedBox(),
-                      //       selected: _selectedIndex == 4,
-                      //       onTap: () {
-                      //         // Update the state of the app
-                      //         _onItemTapped(4);
-                      //       },
-                      //     ),
-                      //   ],
-                      // ),
-                      ListTile(
-                        title: const Text('Account'),
-                        leading: const Icon(Icons.account_circle_rounded),
-                        selected: _selectedIndex == 5,
-                        onTap: () {
-                          // Update the state of the app
-                          _onItemTapped(5);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
+                    );
+                  },
+                  error: (error, stack) {
+                    return ErrorView(error: error);
+                  },
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                );
+              });
             },
             error: (error, stack) {
               return ErrorView(error: error);

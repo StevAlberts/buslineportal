@@ -1,7 +1,10 @@
 import 'package:buslineportal/shared/models/company_model.dart';
+import 'package:buslineportal/shared/models/luggage_ticket_model.dart';
+import 'package:buslineportal/shared/models/passenger_ticket_model.dart';
 import 'package:buslineportal/shared/models/staff_model.dart';
 import 'package:buslineportal/shared/models/staff_details_model.dart';
 import 'package:buslineportal/shared/models/trip_model.dart';
+import 'package:buslineportal/shared/models/user_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -66,6 +69,22 @@ class DatabaseService {
     final firestore = FirebaseFirestore.instance;
     final employeeRef = employeeCollection.doc(employeeId);
     await employeeRef.delete();
+  }
+
+  /// Check for invited employee
+  Future<Map<String,dynamic>?> checkEmployeeInvite(String id, String emailLink) async {
+    final snapshot = await requestsCollection.doc(id).get();
+    return snapshot.data();
+  }
+
+  /// Save employee invite
+  Future<void> saveEmployeeInvite(var staff) async {
+    await requestsCollection.doc(staff["id"]).set(staff);
+  }
+
+  // Save employee
+  Future<void> saveUser(String uid, UserModel user) async {
+    await usersCollection.doc(uid).set(user.toJson());
   }
 
   // create trip
@@ -150,6 +169,26 @@ class DatabaseService {
   Future<void> createCompanyProfile(Company company) async {
     final companyRef = companiesCollection.doc(company.id);
     await companyRef.set(company.toJson());
+  }
+
+  // get all passengers
+  Future<List<PassengerTicket>> getPassengerTickets(String tripId) async {
+    final docSnaps = await passengerTicketsCollection
+        .where('tripId', isEqualTo: tripId)
+        .get();
+    var passengers =
+        docSnaps.docs.map((e) => PassengerTicket.fromJson(e.data())).toList();
+    return passengers;
+  }
+
+  // get al luggage
+
+  Future<List<LuggageTicket>> getLuggageTickets(String tripId) async {
+    final docSnaps =
+        await luggageTicketsCollection.where('tripId', isEqualTo: tripId).get();
+    var luggage =
+        docSnaps.docs.map((e) => LuggageTicket.fromJson(e.data())).toList();
+    return luggage;
   }
 
 // Query job assigned by manager for trip

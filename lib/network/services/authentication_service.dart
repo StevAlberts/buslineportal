@@ -4,11 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class AuthenticationService {
-  final _firebaseAuth = FirebaseAuth.instance;
   final CollectionReference usersCollection =
       FirebaseFirestore.instance.collection('users');
   final CollectionReference requestsCollection =
       FirebaseFirestore.instance.collection('requests');
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // register new user
 
@@ -48,58 +49,60 @@ class AuthenticationService {
     }
   }
 
-  // Function to send sign-in email link
-  Future<void> sendInviteWithEmailLink(String id, String email) async {
-    final auth = FirebaseAuth.instance;
-
+  /// Triggers the email link invite flow.
+  Future<String?> sendInviteWithEmailLink(String id, String email) async {
     // Configure the action code settings.
     ActionCodeSettings actionCodeSettings = ActionCodeSettings(
-      url: 'https://buslinego.web.app/invite/:id=$id',
+      url: 'https://buslinego.web.app/invite/$id',
       handleCodeInApp: true,
     );
 
-    /// TODO: Store the link
+    /// Store the link
     var emailLink = actionCodeSettings.url;
 
     print(emailLink);
 
     // Send the email link to the user.
-    return auth.sendSignInLinkToEmail(
+    await _auth.sendSignInLinkToEmail(
       email: email,
       actionCodeSettings: actionCodeSettings,
     );
+
+    return emailLink;
   }
 
-  Future<void> acceptInviteWithEmailLink(String email) async {
-    final auth = FirebaseAuth.instance;
-
-    // try {
-    //   final emailLink = await auth.currentUser.
-    //       .buildEmailLink(email: emailAddress, actionCodeSettings: actionCodeSettings);
-    //   // Use the generated emailLink for sending the email to the user
-    // } catch (error) {
-    //   // Handle any errors
-    // }
-    //
-    // Configure the action code settings.
-    ActionCodeSettings actionCodeSettings = ActionCodeSettings(
-      url: 'https://buslinego.web.app/invite?email=$email',
-      handleCodeInApp: true,
+  /// Handles the sign-in completion when the user clicks the email link.
+  Future<User?> handleSignInLink({
+    required String id,
+    required String newPassword,
+    required String emailAuth,
+  }) async {
+    try {
+      final confirmationResult = await _auth.createUserWithEmailAndPassword(
+    email: emailAuth,
+    password: newPassword,
     );
 
-    // Send the email link to the user.
-    return auth.sendSignInLinkToEmail(
-      email: email,
-      actionCodeSettings: actionCodeSettings,
-    );
+          final user = confirmationResult.user;
+
+      print(user?.uid);
+
+      // If the user is new (i.e., no password set yet), prompt for password creation.
+      if (user != null) {
+        // Show UI for user to create and confirm password.
+        await user.sendEmailVerification();
+        // reload
+        await user.reload();
+      }
+
+      return user;
+    } on FirebaseAuthException catch (e) {
+      // Handle errors (e.g., invalid link, expired link)
+      print(e);
+      print('Error completing email link sign-in: ${e.message}');
+      return null;
+    }
   }
-
-  Future<bool> logout() async {
-    await _firebaseAuth.signOut();
-    return true;
-  }
-
-
 }
 
 AuthenticationService authenticationService = AuthenticationService();

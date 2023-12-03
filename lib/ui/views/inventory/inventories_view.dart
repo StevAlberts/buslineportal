@@ -14,7 +14,8 @@ import '../../../shared/utils/dynamic_padding.dart';
 
 class InventoriesView extends ConsumerStatefulWidget {
   const InventoriesView({Key? key}) : super(key: key);
-
+  static String get routeName => 'inventories';
+  static String get routeLocation => '/$routeName';
   @override
   ConsumerState<InventoriesView> createState() => _InventoriesViewState();
 }
